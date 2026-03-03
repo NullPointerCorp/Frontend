@@ -1,0 +1,37 @@
+:root {
+  --color-primary: #000000;
+  --color-danger: #e53935;
+  --color-bg: #f9f9f9;
+  --color-card: #ffffff;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --border-radius: 12px;
+}
+
+.clientes-container {
+  padding: 2rem;
+  background-color: var(--color-bg);
+  min-height: 100vh;
+}
+
+.clientes-header {
+  margin-bottom: 1.5rem;
+}
+
+.clientes-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 0.25rem;
+}
+
+.clientes-subtitle {
+  font-size: 0.875rem;
+  color: #888;
+}
+
+.clientes-card {
+  background: var(--color-card);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+}
