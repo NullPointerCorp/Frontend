@@ -190,4 +190,4 @@ const guardar = async () => {
   </v-dialog>
 </template>
 
-<style src="./modal-cliente.style.css"></style>
+<style src="@/assets/styles/modal.style.css"></style>

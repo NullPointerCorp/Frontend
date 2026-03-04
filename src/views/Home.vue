@@ -2,7 +2,6 @@
 import { useAuthStore } from "../stores/auth.store";
 
 const authStore = useAuthStore();
-console.log(authStore.session)
 </script>
 
 <template>

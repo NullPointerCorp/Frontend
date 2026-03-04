@@ -1,13 +1,11 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 
-export type Role = "admin" | "manager" | "empleado";
-
 export interface Session {
   id: number;
   nombre: string;
-  email: string;
-  rol: Role;
+  rol: string;
+  id_rol: number;
 }
 
 export const useAuthStore = defineStore("auth", () => {
@@ -16,7 +14,7 @@ export const useAuthStore = defineStore("auth", () => {
   );
 
   const isAuthenticated = computed(() => !!session.value);
-  const role = computed<Role>(() => {
+  const role = computed<string>(() => {
     if (!session.value) {
       throw new Error("No session available");
     }

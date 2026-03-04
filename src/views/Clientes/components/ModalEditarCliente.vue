@@ -41,7 +41,7 @@ defineExpose({ abrirModal });
       <div class="modal-form">
         <div class="form-group full-width">
           <label class="form-label">ID de Cliente</label>
-          <div class="readonly-field">{{ clienteSeleccionado?.id }}</div>
+          <div class="readonly-field">{{ clienteSeleccionado?.cliente_id }}</div>
         </div>
         <!-- Nombre -->
         <div class="form-group full-width">
@@ -112,4 +112,4 @@ defineExpose({ abrirModal });
   </v-dialog>
 </template>
 
-<style src="./modal-cliente.style.css"></style>
+<style src="@/assets/styles/modal.style.css"></style>

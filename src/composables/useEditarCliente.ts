@@ -11,7 +11,7 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
   const clienteSeleccionado = ref<Cliente | null>(null);
 
   const form = ref({
-    id: 0,
+    cliente_id: 0,
     nombre: "",
     apellido_paterno: "",
     apellido_materno: "",
@@ -22,7 +22,7 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
   const abrirModal = (cliente: Cliente) => {
     clienteSeleccionado.value = cliente;
     form.value = {
-      id: cliente.id,
+      cliente_id: cliente.cliente_id,
       nombre: cliente.nombre,
       apellido_paterno: cliente.apellido_paterno,
       apellido_materno: cliente.apellido_materno,
@@ -40,7 +40,7 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3000/clientes/${clienteSeleccionado.value.id}`,
+        `http://localhost:3000/clientes/${clienteSeleccionado.value.cliente_id}`,
         {
           method: "PUT",
           headers: {
@@ -59,7 +59,7 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
       }
  
       onSuccess({ ...form.value });
-      showToast(`Cliente "${form.value.id} - ${form.value.nombre}" actualizado exitosamente`, 'success');
+      showToast(`Cliente "${form.value.cliente_id} - ${form.value.nombre}" actualizado exitosamente`, 'success');
       dialog.value = false;
     } catch (error) {
       errorMessage.value = "Error al conectar con el servidor";

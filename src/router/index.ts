@@ -5,6 +5,7 @@ import Login from "../views/Login/Login.vue";
 import MainLayout from "../layouts/MainLayout.vue";
 import Dashboard from "../views/Dashboard/Dashboard.vue";
 
+import Sucursales from "@/views/Sucursales/Sucursales.vue";
 import Clientes from "@/views/Clientes/Clientes.vue";
 
 const routes = [
@@ -21,6 +22,7 @@ const routes = [
     children: [
       { path: "dashboard", component: Dashboard },
       { path: "clientes", component: Clientes },
+      { path: "sucursales", component: Sucursales },
     ]
   }
 ];

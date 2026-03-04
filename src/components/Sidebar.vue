@@ -7,7 +7,7 @@ import logo from "@/assets/images/novacodeSP-png.png";
 const router = useRouter();
 const auth = useAuthStore();
 
-const { menuItems } = useMenu(auth.role);
+const { menuItems } = useMenu(auth.session?.id_rol || 0);
 
 const navigateTo = (route: string) => {
   router.push(route);

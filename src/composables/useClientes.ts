@@ -2,6 +2,8 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import type { Cliente } from "@/types/cliente.types";
 import { useConfirmar } from "@/composables/useConfirmar";
+import { useToast } from "@/composables/useToast";
+const { showToast } = useToast();
 
 const todosLosClientes = ref<Cliente[]>([]);
 const search = ref("");
@@ -12,26 +14,31 @@ const loading = ref(false);
 export const useClientes = () => {
   const router = useRouter();
 
-  const { dialog: dialogConfirmar, confirmar, aceptar, cancelar } = useConfirmar();
+  const {
+    dialog: dialogConfirmar,
+    confirmar,
+    aceptar,
+    cancelar,
+  } = useConfirmar();
 
   // Computed
   const clientesFiltrados = computed(() => {
     const q = search.value.toLowerCase();
     return todosLosClientes.value.filter(
       (c) =>
-        c.id.toString().includes(q) ||
+        c.cliente_id.toString().includes(q) ||
         c.nombre.toLowerCase().includes(q) ||
         c.apellido_paterno.toLowerCase().includes(q) ||
         c.apellido_materno.toLowerCase().includes(q) ||
         c.correo.toLowerCase().includes(q) ||
-        c.telefono.includes(q)
+        c.telefono.includes(q),
     );
   });
 
   const totalClientes = computed(() => clientesFiltrados.value.length);
 
   const totalPaginas = computed(() =>
-    Math.ceil(clientesFiltrados.value.length / limit.value)
+    Math.ceil(clientesFiltrados.value.length / limit.value),
   );
 
   const clientesPaginados = computed(() => {
@@ -68,7 +75,7 @@ export const useClientes = () => {
 
   const actualizarCliente = (cliente: Cliente) => {
     todosLosClientes.value = todosLosClientes.value.map((c) =>
-      c.id === cliente.id ? cliente : c
+      c.cliente_id === cliente.cliente_id ? cliente : c,
     );
   };
 
@@ -77,11 +84,22 @@ export const useClientes = () => {
     if (!confirmado) return;
 
     const token = localStorage.getItem("token");
-    await fetch(`http://localhost:3000/clientes/${id}`, {
+    const response = await fetch(`http://localhost:3000/clientes/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
-    todosLosClientes.value = todosLosClientes.value.filter((c) => c.id !== id);
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      showToast(data.message, "error"); // ← muestra el mensaje del backend
+      return;
+    }
+
+    todosLosClientes.value = todosLosClientes.value.filter(
+      (c) => c.cliente_id !== id,
+    );
+    showToast("Cliente eliminado correctamente", "success");
   };
 
   // Navegación

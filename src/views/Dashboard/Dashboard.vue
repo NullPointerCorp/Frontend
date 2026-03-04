@@ -47,9 +47,6 @@ const { catalogItems, navigateTo } = useDashboard();
             </div>
             <h3 class="card-title">{{ item.title }}</h3>
             <p class="card-description">{{ item.description }}</p>
-            <span v-if="item.adminOnly" class="admin-badge">
-              SOLO ADMIN
-            </span>
           </div>
         </v-card>
       </div>

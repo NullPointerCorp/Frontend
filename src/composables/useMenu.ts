@@ -1,42 +1,19 @@
 import { computed } from "vue";
 
-type Role = "admin" | "manager" | "empleado";
+const allItems = [
+  { icon: 'mdi-view-dashboard', title: 'Dashboard', route: '/dashboard', roles: [1, 2, 3] },
+  { icon: 'mdi-store', title: 'Sucursales', route: '/sucursales', roles: [1, 2] },
+  { icon: 'mdi-warehouse', title: 'Almacenes', route: '/almacenes', roles: [1, 2] },
+  { icon: 'mdi-badge-account', title: 'Empleados', route: '/empleados', roles: [1] },
+  { icon: 'mdi-truck', title: 'Transporte', route: '/transporte', roles: [1, 2] },
+  { icon: 'mdi-account-group', title: 'Clientes', route: '/clientes', roles: [1, 2] },
+  { icon: 'mdi-package-variant-closed', title: 'Paquetes', route: '/paquetes', roles: [1, 2, 3] },
+]
 
-export function useMenu(role: Role) {
-  const menuItems = computed(() => {
-    const base = [
-      { icon: "mdi-view-dashboard", title: "Dashboard", route: "/dashboard" },
-    ];
+export const useMenu = (rolId: number) => {
+  const menuItems = computed(() =>
+    allItems.filter(item => item.roles.includes(rolId))
+  )
 
-    if (role === "admin") {
-      base.push(
-        { icon: "mdi-store", title: "Sucursales", route: "/sucursales" },
-        { icon: "mdi-warehouse", title: "Almacenes", route: "/almacenes" },
-        { icon: "mdi-badge-account", title: "Empleados", route: "/empleados" },
-        { icon: "mdi-truck", title: "Transporte", route: "/transporte" },
-        {
-          icon: "mdi-account-group",
-          title: "Clientes",
-          route: "/clientes",
-        },
-        {
-          icon: "mdi-package-variant-closed",
-          title: "Paquetes",
-          route: "/paquetes",
-        },
-      );
-    }
-
-    if (role === "manager") {
-      base.push({
-        icon: "mdi-account-group",
-        title: "Clientes",
-        route: "/clientes",
-      });
-    }
-
-    return base;
-  });
-
-  return { menuItems };
+  return { menuItems }
 }
