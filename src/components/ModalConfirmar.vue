@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ dialog: boolean; mensaje?: string }>();
+defineProps<{ dialog: boolean; mensaje: string }>();
 defineEmits<{ (e: "aceptar"): void; (e: "cancelar"): void }>();
 </script>
 
@@ -7,7 +7,7 @@ defineEmits<{ (e: "aceptar"): void; (e: "cancelar"): void }>();
   <v-dialog :model-value="dialog" max-width="400" persistent>
     <v-card rounded="lg">
       <v-card-title class="pt-5 px-6">¿Estás seguro?</v-card-title>
-      <v-card-subtitle class="px-6">{{ mensaje ?? "Esta acción no se puede deshacer" }}</v-card-subtitle>
+      <v-card-text class="px-6">{{ mensaje }}</v-card-text> <!-- ← cambiar subtitle por text -->
       <v-card-actions class="px-6 pb-5">
         <v-spacer />
         <v-btn variant="text" @click="$emit('cancelar')">Cancelar</v-btn>

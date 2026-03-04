@@ -15,8 +15,7 @@ const loading = ref(false);
 
 export const useSucursales = () => {
   const router = useRouter();
-  const { dialog: dialogConfirmar, confirmar, aceptar, cancelar } = useConfirmar();
-
+const { dialog: dialogConfirmar, mensaje: mensajeConfirmar, confirmar, aceptar, cancelar } = useConfirmar();
   // Computed
   const sucursalesFiltradas = computed(() => {
     const q = search.value.toLowerCase();
@@ -67,25 +66,26 @@ export const useSucursales = () => {
     );
   };
   
-  const eliminarSucursal = async (sucursal_id: number) => {
-    const confirmado = await confirmar();
-    if (!confirmado) return;
-    const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:3000/sucursales/${sucursal_id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const eliminarSucursal = async (item: Sucursal) => {
+  const confirmado = await confirmar(`¿Desea eliminar la sucursal ${item.nombre_sucursal} - ${item.nombre_ciudad}?`)
+  if (!confirmado) return;
 
-    const data = await response.json();
+  const token = localStorage.getItem("token");
+  const response = await fetch(`http://localhost:3000/sucursales/${item.sucursal_id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
-    if (!response.ok) {
-      showToast(data.message, "error");
-      return;
-    }
+  const data = await response.json();
 
-    todasLasSucursales.value = todasLasSucursales.value.filter((s) => s.sucursal_id !== sucursal_id);
-    showToast("Sucursal eliminada correctamente", "success");
-  };
+  if (!response.ok) {
+    showToast("¡La sucursal no se puede eliminar, ya que cuenta con registros asociados!", "error");
+    return;
+  }
+
+  todasLasSucursales.value = todasLasSucursales.value.filter((s) => s.sucursal_id !== item.sucursal_id);
+  showToast("¡Sucursal eliminada con éxito!", "success");
+};
 
   return {
     sucursalesPaginadas,
@@ -100,6 +100,7 @@ export const useSucursales = () => {
     actualizarSucursal,
     eliminarSucursal,
     dialogConfirmar,
+    mensajeConfirmar,
     aceptar,
     cancelar,
   };

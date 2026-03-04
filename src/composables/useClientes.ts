@@ -16,6 +16,7 @@ export const useClientes = () => {
 
   const {
     dialog: dialogConfirmar,
+    mensaje: mensajeConfirmar,
     confirmar,
     aceptar,
     cancelar,
@@ -79,27 +80,36 @@ export const useClientes = () => {
     );
   };
 
-  const eliminarCliente = async (id: number) => {
-    const confirmado = await confirmar();
+  const eliminarCliente = async (item: Cliente) => {
+    const nombreCompleto = `${item.nombre} ${item.apellido_paterno}`;
+    const confirmado = await confirmar(
+      `¿Desea eliminar el cliente ${nombreCompleto} - ${item.correo}?`,
+    );
     if (!confirmado) return;
 
     const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:3000/clientes/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await fetch(
+      `http://localhost:3000/clientes/${item.cliente_id}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
 
     const data = await response.json();
 
     if (!response.ok) {
-      showToast(data.message, "error"); // ← muestra el mensaje del backend
+      showToast(
+        "¡El cliente no se puede eliminar, ya que cuenta con registros asociados!",
+        "error",
+      );
       return;
     }
 
     todosLosClientes.value = todosLosClientes.value.filter(
-      (c) => c.cliente_id !== id,
+      (c) => c.cliente_id !== item.cliente_id,
     );
-    showToast("Cliente eliminado correctamente", "success");
+    showToast("¡Cliente eliminado con éxito!", "success");
   };
 
   // Navegación
@@ -130,6 +140,7 @@ export const useClientes = () => {
     dialogConfirmar,
     aceptar,
     cancelar,
+    mensajeConfirmar,
     // Navegación
     navigateTo,
     logout,

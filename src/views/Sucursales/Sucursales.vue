@@ -22,6 +22,7 @@ const {
   fetchSucursales,
   agregarSucursal,
   actualizarSucursal,
+  mensajeConfirmar,
   eliminarSucursal,
   dialogConfirmar,
   aceptar,
@@ -115,11 +116,11 @@ watch(search, () => { page.value = 1; });
 
       <!-- Modales -->
       <ModalConfirmar
-        :dialog="dialogConfirmar"
-        mensaje="¿Deseas eliminar esta sucursal?"
-        @aceptar="aceptar"
-        @cancelar="cancelar"
-      />
+  :dialog="dialogConfirmar"
+  :mensaje="mensajeConfirmar"
+  @aceptar="aceptar"
+  @cancelar="cancelar"
+/>
       <ModalEditarSucursal ref="modalEditar" @sucursalEditada="actualizarSucursal" />
 
     </v-main>

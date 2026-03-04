@@ -27,6 +27,7 @@ const {
   actualizarCliente,
   eliminarCliente,
   dialogConfirmar,
+  mensajeConfirmar,
   aceptar,
   cancelar,
 } = useClientes();
@@ -107,8 +108,12 @@ watch(search, () => { page.value = 1; });
       </div>
 
       <!-- Modales -->
-      <ModalConfirmar :dialog="dialogConfirmar" mensaje="¿Deseas eliminar este cliente?"
-        @aceptar="aceptar" @cancelar="cancelar" />
+      <ModalConfirmar
+  :dialog="dialogConfirmar"
+  :mensaje="mensajeConfirmar"
+  @aceptar="aceptar"
+  @cancelar="cancelar"
+/>
       <ModalEditarCliente ref="modalEditar" @clienteEditado="actualizarCliente" />
 
     </v-main>

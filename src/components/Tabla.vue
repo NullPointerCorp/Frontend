@@ -12,7 +12,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   editar: [item: any]
-  eliminar: [id: number]
+  eliminar: [item: any]  // ← item completo
   'update:page': [page: number]
 }>()
 
@@ -44,7 +44,7 @@ const getItemId = (item: any): number => {
             <v-btn icon variant="text" size="small" @click="emit('editar', item)">
               <v-icon size="18">mdi-pencil-outline</v-icon>
             </v-btn>
-            <v-btn icon variant="text" size="small" @click="emit('eliminar', getItemId(item))">
+            <v-btn icon variant="text" size="small" @click="emit('eliminar', item)">
               <v-icon size="18">mdi-trash-can-outline</v-icon>
             </v-btn>
           </div>

@@ -59,7 +59,7 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
       }
  
       onSuccess({ ...form.value });
-      showToast(`Cliente "${form.value.cliente_id} - ${form.value.nombre}" actualizado exitosamente`, 'success');
+      showToast(`¡Cliente modificado con éxito!`, 'success');
       dialog.value = false;
     } catch (error) {
       errorMessage.value = "Error al conectar con el servidor";

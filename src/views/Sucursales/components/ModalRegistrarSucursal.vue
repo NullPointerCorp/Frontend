@@ -54,7 +54,7 @@ const guardar = async () => {
   try {
     const nuevaSucursal = await registrarSucursal()
     emit('sucursalCreada', nuevaSucursal)
-    showToast(`Sucursal "${form.nombre_sucursal}" registrada exitosamente`, 'success')
+    showToast(`¡Sucursal registrada con éxito!`, 'success')
     cancelar()
   } catch (error: any) {
     showToast(error.message || 'Error de conexión con el servidor', 'error')
