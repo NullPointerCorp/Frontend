@@ -1,73 +1,123 @@
-.container {
-  height: 100vh;
+/* Variables */
+:root {
+  --primary-color: #1565c0;
+  --primary-dark: #0d47a1;
+  --background-color: #f9fafc;
+  --card-background: #ffffff;
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --border-color: #e0e0e0;
+}
+
+/* Fondo principal */
+.login-background {
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: #ffffff;
+  justify-content: center;
+  background-color: var(--background-color);
 }
 
-.logo {
-  width: 110px;
-  display: block;
-  margin: 0 auto 10px auto;
+img {
+  width: 120px;
+  margin-bottom: 16px;
+  margin-bottom: 0px;
 }
 
-.error {
-  color: red;
-  margin-top: 10px;
-  font-size: 14px;
-  font-weight: 500;
+/* Tarjeta */
+.login-card {
+  padding: 32px;
+  width: 420px;
+  border-radius: 12px;
+  background-color: var(--card-background) !important;
+  box-shadow: none !important;
 }
 
-.card {
-  width: 350px;
-  padding: 2rem;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+/* Header */
+.login-header {
   text-align: center;
-  transition: transform 0.2s ease;
+  margin-bottom: 24px;
 }
 
-.card:hover {
-  transform: translateY(-5px);
+.login-avatar {
+  background-color: var(--primary-color) !important;
+  width: 56px !important;
+  height: 56px !important;
+  margin-bottom: 16px;
 }
 
-h2 {
-  margin-bottom: 1.5rem;
-  font-weight: 600;
-  color: black;
+.login-avatar .v-icon {
+  color: white !important;
 }
 
-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 1rem;
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.login-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Formulario */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group-last {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+/* Inputs */
+.login-card .v-field {
   border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 14px;
-  transition: border 0.2s ease;
-  background-color: #ffffff;
-  color: black;
 }
 
-input:focus {
-  outline: none;
-  border: 1px solid #333;
+.login-card .v-field__outline {
+  color: var(--border-color);
 }
 
-button {
-  width: 100%;
-  padding: 12px;
+.login-card .v-field--focused .v-field__outline {
+  color: var(--primary-color);
+}
+
+.login-card .v-field__prepend-inner .v-icon {
+  color: var(--text-secondary);
+}
+
+/* Botón */
+.login-btn {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  text-transform: none !important;
+  font-weight: 500;
   border-radius: 8px;
-  border: none;
-  background: #000000;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
+  letter-spacing: normal;
 }
 
-button:hover {
-  opacity: 0.85;
+.login-btn:hover {
+  background-color: var(--primary-dark) !important;
+}
+
+/* Footer */
+.login-footer {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
 }

@@ -16,7 +16,7 @@ defineExpose({ abrirModal });
     <v-card rounded="lg">
       <v-card-title class="pt-5 px-6">Editar Cliente</v-card-title>
       <v-card-subtitle class="px-6">ID: {{ clienteSeleccionado?.id }}</v-card-subtitle>
-
+      
       <v-card-text class="px-6">
         <v-text-field v-model="form.nombre" label="Nombre" variant="outlined" density="compact" class="mb-2" />
         <v-text-field v-model="form.apellido_paterno" label="Apellido Paterno" variant="outlined" density="compact"

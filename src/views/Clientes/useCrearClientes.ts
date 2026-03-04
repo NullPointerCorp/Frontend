@@ -1,6 +1,9 @@
 import { ref } from "vue";
 import type { Cliente, CrearClienteDTO } from "../../types/cliente.types";
 
+import { useToast } from '@/composables/useToast'
+const { showToast } = useToast()
+
 export const useCrearCliente = (onSuccess: (cliente: Cliente) => void) => {
   const dialog = ref(false);
   const loading = ref(false);
@@ -49,7 +52,7 @@ export const useCrearCliente = (onSuccess: (cliente: Cliente) => void) => {
       onSuccess({ id: data.id, ...form.value });
       resetForm();
       dialog.value = false;
-    } catch {
+      } catch (error) {
       errorMessage.value = "Error al conectar con el servidor";
     } finally {
       loading.value = false;

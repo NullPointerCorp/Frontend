@@ -1,6 +1,9 @@
 import { ref } from "vue";
 import type { Cliente } from "../../types/cliente.types";
 
+import { useToast } from '@/composables/useToast'
+const { showToast } = useToast()
+
 export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
   const dialog = ref(false);
   const loading = ref(false);
@@ -8,6 +11,7 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
   const clienteSeleccionado = ref<Cliente | null>(null);
 
   const form = ref({
+    id: 0,
     nombre: "",
     apellido_paterno: "",
     apellido_materno: "",
@@ -18,6 +22,7 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
   const abrirModal = (cliente: Cliente) => {
     clienteSeleccionado.value = cliente;
     form.value = {
+      id: cliente.id,
       nombre: cliente.nombre,
       apellido_paterno: cliente.apellido_paterno,
       apellido_materno: cliente.apellido_materno,
@@ -53,9 +58,10 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
         return;
       }
 
-      onSuccess({ id: clienteSeleccionado.value.id, ...form.value });
+      onSuccess({ ...form.value });
+      showToast(`Cliente "${form.value.id} - ${form.value.nombre}" actualizado exitosamente`, 'success');
       dialog.value = false;
-    } catch {
+    } catch (error) {
       errorMessage.value = "Error al conectar con el servidor";
     } finally {
       loading.value = false;

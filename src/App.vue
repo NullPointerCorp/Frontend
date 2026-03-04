@@ -1,10 +1,10 @@
-<template>
-  <!-- <v-app>
-    <Login />
-  </v-app> -->
-  <router-view />
-</template>
-
 <script setup lang="ts">
-// import Login from "./views/Login.vue"
+import ToastContainer from '@/components/ToastContainer.vue'
 </script>
+
+<template>
+  <v-app>
+    <router-view />
+    <ToastContainer />
+  </v-app>
+</template>

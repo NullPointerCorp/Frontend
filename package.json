@@ -9,12 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
     "firebase": "^12.9.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.25",
     "vue-router": "^5.0.3",
+    "vue-sonner": "^2.0.9",
     "vuetify": "^4.0.0",
-    "zod": "^4.3.6"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
