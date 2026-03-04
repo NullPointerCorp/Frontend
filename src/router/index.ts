@@ -2,14 +2,27 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "../stores/auth.store";
 
 import Login from "../views/Login/Login.vue";
-import Clientes from "../views/Clientes/Clientes.vue";
+import MainLayout from "../layouts/MainLayout.vue";
 import Dashboard from "../views/Dashboard/Dashboard.vue";
 
+import Clientes from "@/views/Clientes/Clientes.vue";
+
 const routes = [
-  { path: "/",redirect: "/login" },
-  { path: "/login", component: Login },
-  { path: "/dashboard", component: Dashboard },
-  { path: "/clientes", component: Clientes },
+  { path: "/", redirect: "/login" },
+
+  {
+    path: "/login",
+    component: Login,
+    meta: { public: true }
+  },
+  {
+    path: "/",
+    component: MainLayout,
+    children: [
+      { path: "dashboard", component: Dashboard },
+      { path: "clientes", component: Clientes },
+    ]
+  }
 ];
 
 export const router = createRouter({

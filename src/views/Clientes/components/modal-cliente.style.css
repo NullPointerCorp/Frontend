@@ -7,6 +7,7 @@
   --text-secondary: #757575;
   --border-color: #e0e0e0;
   --background-light: #fafafa;
+  --background-red: #cc3201;
 }
 
 /* Botón de registro */
@@ -95,7 +96,7 @@
   color: #d32f2f;
 }
 
-/* Input styling */
+/* Input styling con :deep() para penetrar Vuetify */
 .modal-form :deep(.v-field) {
   border-radius: 8px;
 }
@@ -111,10 +112,10 @@
 /* Actions */
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 12px;
   margin-top: 32px;
-  padding-top: 24px;
+  padding: 14px;
   border-top: 1px solid var(--border-color);
 }
 
@@ -123,7 +124,8 @@
   font-weight: 500;
   border-radius: 8px;
   border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
+  color: white !important;
+  background-color: var(--background-red) !important;
 }
 
 .cancel-btn:hover {

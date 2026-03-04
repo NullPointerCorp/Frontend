@@ -1,8 +1,5 @@
 import { ref } from "vue";
-import type { Cliente, CrearClienteDTO } from "../../types/cliente.types";
-
-import { useToast } from '@/composables/useToast'
-const { showToast } = useToast()
+import type { Cliente, CrearClienteDTO } from "@/types/cliente.types";
 
 export const useCrearCliente = (onSuccess: (cliente: Cliente) => void) => {
   const dialog = ref(false);

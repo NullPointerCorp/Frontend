@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import type { Cliente } from "../../types/cliente.types";
+import type { Cliente } from "@/types/cliente.types";
 
 import { useToast } from '@/composables/useToast'
 const { showToast } = useToast()
@@ -57,7 +57,7 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
         errorMessage.value = data.message || "Error al actualizar cliente";
         return;
       }
-
+ 
       onSuccess({ ...form.value });
       showToast(`Cliente "${form.value.id} - ${form.value.nombre}" actualizado exitosamente`, 'success');
       dialog.value = false;

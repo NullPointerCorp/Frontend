@@ -1,48 +1,18 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import type { Cliente } from "../../types/cliente.types";
-import { useConfirmar } from "../../composables/useConfirmar";
+import type { Cliente } from "@/types/cliente.types";
+import { useConfirmar } from "@/composables/useConfirmar";
 
-import { useToast } from '@/composables/useToast'
-
-const { showToast } = useToast()
+const todosLosClientes = ref<Cliente[]>([]);
+const search = ref("");
+const page = ref(1);
+const limit = ref(10);
+const loading = ref(false);
 
 export const useClientes = () => {
   const router = useRouter();
 
-  // Menu items para sidebar
-  const menuItems = ref([
-    { icon: "mdi-view-dashboard", title: "Dashboard", route: "/dashboard" },
-    {
-      icon: "mdi-account-group",
-      title: "Clientes",
-      route: "/clientes",
-      active: true,
-    },
-    { icon: "mdi-badge-account", title: "Empleados", route: "/empleados" },
-    { icon: "mdi-store", title: "Sucursales", route: "/sucursales" },
-    { icon: "mdi-warehouse", title: "Almacenes", route: "/almacenes" },
-    { icon: "mdi-truck", title: "Transporte", route: "/transporte" },
-    {
-      icon: "mdi-package-variant-closed",
-      title: "Paquetes",
-      route: "/paquetes",
-    },
-  ]);
-
-  // Usuario
-  const user = ref({
-    name: "Admin User",
-    role: "Logistics Manager",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-  });
-
-  // Estado de clientes
-  const todosLosClientes = ref<Cliente[]>([]);
-  const search = ref("");
-  const page = ref(1);
-  const limit = ref(10);
-  const loading = ref(false);
+  const { dialog: dialogConfirmar, confirmar, aceptar, cancelar } = useConfirmar();
 
   // Computed
   const clientesFiltrados = computed(() => {
@@ -54,14 +24,14 @@ export const useClientes = () => {
         c.apellido_paterno.toLowerCase().includes(q) ||
         c.apellido_materno.toLowerCase().includes(q) ||
         c.correo.toLowerCase().includes(q) ||
-        c.telefono.includes(q),
+        c.telefono.includes(q)
     );
   });
 
   const totalClientes = computed(() => clientesFiltrados.value.length);
 
   const totalPaginas = computed(() =>
-    Math.ceil(clientesFiltrados.value.length / limit.value),
+    Math.ceil(clientesFiltrados.value.length / limit.value)
   );
 
   const clientesPaginados = computed(() => {
@@ -69,19 +39,7 @@ export const useClientes = () => {
     return clientesFiltrados.value.slice(start, start + limit.value);
   });
 
-  // Acciones de clientes
-  const agregarCliente = (cliente: Cliente) => {
-    if (!cliente) {
-      console.error("Cliente es null o undefined");
-      return;
-    }
-
-    console.log("Agregando cliente a la lista:", cliente);
-
-    // Agregar al inicio de la lista
-    todosLosClientes.value = [cliente, ...todosLosClientes.value];
-  };
-
+  // Acciones
   const fetchClientes = async () => {
     loading.value = true;
     try {
@@ -104,22 +62,20 @@ export const useClientes = () => {
     }
   };
 
-  const actualizarCliente = (cliente: Cliente) => {
-    const index = todosLosClientes.value.findIndex((c) => c.id === cliente.id);
-    if (index !== -1) todosLosClientes.value[index] = cliente;
+  const agregarCliente = (cliente: Cliente) => {
+    todosLosClientes.value = [...todosLosClientes.value, cliente];
   };
 
-  // Confirmar eliminación
-  const {
-    dialog: dialogConfirmar,
-    confirmar,
-    aceptar,
-    cancelar,
-  } = useConfirmar();
+  const actualizarCliente = (cliente: Cliente) => {
+    todosLosClientes.value = todosLosClientes.value.map((c) =>
+      c.id === cliente.id ? cliente : c
+    );
+  };
 
   const eliminarCliente = async (id: number) => {
     const confirmado = await confirmar();
     if (!confirmado) return;
+
     const token = localStorage.getItem("token");
     await fetch(`http://localhost:3000/clientes/${id}`, {
       method: "DELETE",
@@ -139,10 +95,7 @@ export const useClientes = () => {
   };
 
   return {
-    // UI
-    menuItems,
-    user,
-    // Clientes
+    // Estado
     clientesPaginados,
     totalPaginas,
     totalClientes,
