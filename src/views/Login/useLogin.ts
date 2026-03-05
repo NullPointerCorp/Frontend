@@ -34,7 +34,6 @@ export const useLogin = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
       const token = await userCredential.user.getIdToken();
 
-      // Obtener sesión desde tu backend
       const sessionData = await authService.getSession(token);
 
       // Guardar sesión en Pinia
@@ -47,6 +46,9 @@ export const useLogin = () => {
       router.replace("/dashboard");
 
     } catch (err: any) {
+      console.error("Firebase login error:", err);
+      console.error("code:", err.code);
+      console.error("message:", err.message);
       if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password" || err.code === "auth/user-not-found") {
         errorMessage.value = "Correo o contraseña incorrectos";
       } else {
