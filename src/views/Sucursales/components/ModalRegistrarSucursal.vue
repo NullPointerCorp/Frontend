@@ -6,9 +6,18 @@ import { useToast } from '@/composables/useToast'
 import type { Sucursal } from '@/types/sucursal.types'
 
 const { showToast } = useToast()
-const { form, resetForm, registrarSucursal } = useRegistrarSucursal()
-const { estados, ciudades, supervisores, loadingSupervisores, supervisorSeleccionado,
-        loadingEstados, loadingCiudades, estadoSeleccionado, fetchEstados, fetchSupervisores } = useUbicacion()
+const { form, resetForm, registrarSucursal, validate } = useRegistrarSucursal()
+const {
+  estados,
+  ciudades,
+  supervisores,
+  loadingSupervisores,
+  loadingEstados,
+  loadingCiudades,
+  estadoSeleccionado,
+  fetchEstados,
+  fetchSupervisores,
+} = useUbicacion()
 
 const emit = defineEmits<{
   sucursalCreada: [sucursal: Sucursal]
@@ -28,7 +37,7 @@ watch(dialog, async (abierto) => {
 })
 
 watch(estadoSeleccionado, (nuevo, anterior) => {
-  if (anterior !== null) form.ciudad_id = null as any
+  if (anterior !== null) form.ciudad_id = null
 })
 
 const handleKeydown = (e: KeyboardEvent) => {
@@ -50,11 +59,18 @@ const cancelar = () => {
 }
 
 const guardar = async () => {
+  const { valid } = await formRef.value?.validate()
+
+  if (!valid) {
+    showToast('Por favor corrige los errores del formulario', 'warning')
+    return
+  }
+
   loading.value = true
   try {
     const nuevaSucursal = await registrarSucursal()
     emit('sucursalCreada', nuevaSucursal)
-    showToast(`¡Sucursal registrada con éxito!`, 'success')
+    showToast('¡Sucursal registrada con éxito!', 'success')
     cancelar()
   } catch (error: any) {
     showToast(error.message || 'Error de conexión con el servidor', 'error')
@@ -84,7 +100,7 @@ const guardar = async () => {
 
       <v-form ref="formRef" @submit.prevent="guardar" class="modal-form">
 
-        <!-- Nombre -->
+        <!-- Nombre y Supervisor -->
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">
@@ -98,21 +114,23 @@ const guardar = async () => {
               variant="outlined"
               density="comfortable"
               hide-details="auto"
+              :rules="[validate('nombre_sucursal')]"
             />
           </div>
           <div class="form-group">
             <label class="form-label">Supervisor de sucursal (si aplica)</label>
             <v-select
-              v-model="form.empleado_id_supervisor"
-              :items="supervisores"
-              :item-title="(g) => `${g.nombre} ${g.apellido_paterno}`"
-              item-value="empleado_id"
-              placeholder="Seleccionar supervisor"
-              variant="outlined"
-              density="comfortable"
-              hide-details="auto"
-              :loading="loadingSupervisores"
-            />
+            v-model="form.empleado_id_supervisor"
+            :items="supervisores"
+            :item-title="(s: any) => `${s.nombre} ${s.apellido_paterno}`"
+            item-value="empleado_id"
+            placeholder="Seleccionar supervisor"
+            variant="outlined"
+            density="comfortable"
+            hide-details="auto"
+            :loading="loadingSupervisores"
+            clearable
+          />
           </div>
         </div>
 
@@ -151,6 +169,7 @@ const guardar = async () => {
               hide-details="auto"
               :loading="loadingCiudades"
               :disabled="!estadoSeleccionado"
+              :rules="[validate('ciudad_id')]"
             />
           </div>
         </div>
@@ -159,15 +178,37 @@ const guardar = async () => {
         <div class="form-row-three">
           <div class="form-group">
             <label class="form-label">Colonia <span class="required">*</span></label>
-            <v-text-field v-model="form.colonia" placeholder="Ej: Emiliano Zapata" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field
+              v-model="form.colonia"
+              placeholder="Ej: Emiliano Zapata"
+              variant="outlined"
+              density="comfortable"
+              hide-details="auto"
+              :rules="[validate('colonia')]"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Código Postal <span class="required">*</span></label>
-            <v-text-field v-model="form.codigo_postal" placeholder="Ej: 80000" variant="outlined" density="comfortable" hide-details="auto" maxlength="5" />
+            <v-text-field
+              v-model="form.codigo_postal"
+              placeholder="Ej: 80000"
+              variant="outlined"
+              density="comfortable"
+              hide-details="auto"
+              maxlength="5"
+              :rules="[validate('codigo_postal')]"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Calle <span class="required">*</span></label>
-            <v-text-field v-model="form.calle" placeholder="Ej: Jesús García" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field
+              v-model="form.calle"
+              placeholder="Ej: Jesús García"
+              variant="outlined"
+              density="comfortable"
+              hide-details="auto"
+              :rules="[validate('calle')]"
+            />
           </div>
         </div>
 
@@ -175,11 +216,22 @@ const guardar = async () => {
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Numero Exterior <span class="required">*</span></label>
-            <v-text-field v-model="form.numero_exterior" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field
+              v-model="form.numero_exterior"
+              variant="outlined"
+              density="comfortable"
+              hide-details="auto"
+              :rules="[validate('numero_exterior')]"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Numero Interior</label>
-            <v-text-field v-model="form.numero_interior" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field
+              v-model="form.numero_interior"
+              variant="outlined"
+              density="comfortable"
+              hide-details="auto"
+            />
           </div>
         </div>
 
@@ -193,11 +245,23 @@ const guardar = async () => {
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Longitud</label>
-            <v-text-field v-model.number="form.longitud" type="number" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field
+              v-model.number="form.longitud"
+              type="number"
+              variant="outlined"
+              density="comfortable"
+              hide-details="auto"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Latitud</label>
-            <v-text-field v-model.number="form.latitud" type="number" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field
+              v-model.number="form.latitud"
+              type="number"
+              variant="outlined"
+              density="comfortable"
+              hide-details="auto"
+            />
           </div>
         </div>
 
@@ -213,7 +277,7 @@ const guardar = async () => {
       </v-form>
 
       <div class="modal-footer">
-        <span>© 2026 NovaLogistics.</span>
+        <span>© 2026 NovaCode.</span>
       </div>
 
     </v-card>

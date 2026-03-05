@@ -3,6 +3,11 @@ import { useEditarCliente } from "@/composables/useEditarCliente";
 import type { Cliente } from "../../../types/cliente.types";
 import { onMounted, onUnmounted } from 'vue'
 
+const emit = defineEmits<{ (e: "clienteEditado", cliente: Cliente): void }>()
+
+const { dialog, loading, errorMessage, form, clienteSeleccionado, abrirModal, editarCliente, validate } =
+  useEditarCliente((cliente) => emit("clienteEditado", cliente))
+
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return
   if (e.key === 'Escape') dialog.value = false
@@ -12,20 +17,13 @@ const handleKeydown = (e: KeyboardEvent) => {
 onMounted(() => window.addEventListener('keydown', handleKeydown))
 onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
-const emit = defineEmits<{ (e: "clienteEditado", cliente: Cliente): void }>();
-
-const { dialog, loading, errorMessage, form, clienteSeleccionado, abrirModal, editarCliente } = useEditarCliente((cliente) => {
-  emit("clienteEditado", cliente);
-});
-
-defineExpose({ abrirModal });
+defineExpose({ abrirModal })
 </script>
 
 <template>
   <v-dialog v-model="dialog" max-width="600" persistent>
     <v-card class="modal-card" theme="light">
 
-      <!-- Header -->
       <div class="modal-header">
         <button class="back-link" type="button" @click="dialog = false">
           <v-icon size="18">mdi-chevron-left</v-icon>
@@ -37,38 +35,53 @@ defineExpose({ abrirModal });
         </p>
       </div>
 
-      <!-- Form -->
       <div class="modal-form">
+
         <div class="form-group full-width">
           <label class="form-label">ID de Cliente</label>
           <div class="readonly-field">{{ clienteSeleccionado?.cliente_id }}</div>
         </div>
+
         <!-- Nombre -->
         <div class="form-group full-width">
-          <label class="form-label">
-            Nombre(s) <span class="required">*</span>
-          </label>
-          <v-text-field v-model="form.nombre" placeholder="Ej. Luis Enrique" variant="outlined" density="comfortable"
-            hide-details="auto" />
+          <label class="form-label">Nombre(s) <span class="required">*</span></label>
+          <v-text-field
+            v-model="form.nombre"
+            placeholder="Ej. Luis Enrique"
+            variant="outlined"
+            density="comfortable"
+            :rules="[validate('nombre')]"
+            hide-details="auto"
+          />
         </div>
 
         <!-- Apellidos -->
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">
-              Apellido Paterno <span class="required">*</span>
-            </label>
-            <v-text-field v-model="form.apellido_paterno" placeholder="Ej. Pérez" variant="outlined"
-              density="comfortable" hide-details="auto" />
+            <label class="form-label">Apellido Paterno <span class="required">*</span></label>
+            <v-text-field
+              v-model="form.apellido_paterno"
+              placeholder="Ej. Pérez"
+              variant="outlined"
+              density="comfortable"
+              :rules="[validate('apellido_paterno')]"
+              hide-details="auto"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Apellido Materno</label>
-            <v-text-field v-model="form.apellido_materno" placeholder="Ej. López" variant="outlined"
-              density="comfortable" hide-details="auto" />
+            <v-text-field
+              v-model="form.apellido_materno"
+              placeholder="Ej. López"
+              variant="outlined"
+              density="comfortable"
+              :rules="[validate('apellido_materno')]"
+              hide-details="auto"
+            />
           </div>
         </div>
 
-        <!-- Correo y Teléfono -->
+        <!-- Correo readonly y Teléfono -->
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">
@@ -80,10 +93,17 @@ defineExpose({ abrirModal });
           <div class="form-group">
             <label class="form-label">
               <v-icon size="16" class="label-icon">mdi-phone-outline</v-icon>
-              Teléfono de Contacto <span class="required">*</span>
+              Teléfono de Contacto
             </label>
-            <v-text-field v-model="form.telefono" placeholder="+52 1234 5678" variant="outlined" density="comfortable"
-              hide-details="auto" maxlength="10" />
+            <v-text-field
+              v-model="form.telefono"
+              placeholder="1234567890"
+              variant="outlined"
+              density="comfortable"
+              :rules="[validate('telefono')]"
+              hide-details="auto"
+              maxlength="10"
+            />
           </div>
         </div>
 
@@ -91,21 +111,17 @@ defineExpose({ abrirModal });
 
       </div>
 
-      <!-- Actions -->
       <div class="modal-actions">
         <v-btn class="cancel-btn" variant="outlined" type="button" @click="dialog = false" :disabled="loading">
-          <v-icon start>mdi-close</v-icon>
-          Cancelar
+          <v-icon start>mdi-close</v-icon> Cancelar
         </v-btn>
         <v-btn class="save-btn" :loading="loading" @click="editarCliente">
-          <v-icon start>mdi-content-save-outline</v-icon>
-          Guardar Cliente
+          <v-icon start>mdi-content-save-outline</v-icon> Guardar Cliente
         </v-btn>
       </div>
 
-      <!-- Footer -->
       <div class="modal-footer">
-        <span>© 2026 NovaLogistics.</span>
+        <span>© 2026 NovaCode.</span>
       </div>
 
     </v-card>

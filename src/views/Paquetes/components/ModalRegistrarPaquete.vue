@@ -5,7 +5,7 @@ import { useToast } from '@/composables/useToast'
 import type { Paquete } from '@/types/paquete.types'
 
 const { showToast } = useToast()
-const { form, resetForm, registrarPaquete } = useRegistrarPaquete()
+const { form, resetForm, registrarPaquete, validate, preciosPorTamano } = useRegistrarPaquete()
 
 const emit = defineEmits<{ paqueteCreado: [paquete: Paquete] }>()
 
@@ -26,27 +26,14 @@ const tamanioOpciones = [
 ]
 
 const formaOpciones = [
-  { title: 'Cuadrada', value: 'cuadrada' },
-  { title: 'Rectangular', value: 'rectangular' },
-  { title: 'Circular', value: 'circular' },
+  { title: 'Cuadrada', value: 'Cuadrada' },
+  { title: 'Rectangular', value: 'Rectangular' },
+  { title: 'Circular', value: 'Circular' },
 ]
 
-const preciosPorTamano: Record<string, number> = {
-  'Pequeño': 5,
-  'Mediano': 10,
-  'Grande': 15,
-  'Extra Grande': 20,
-}
-
-// Calcula el precio automáticamente según el tamaño
 const precioCalculado = computed(() => {
   if (!form.tamano) return null
   return preciosPorTamano[form.tamano] ?? null
-})
-
-// Sincroniza el precio en el form cuando cambia el tamaño
-watch(() => form.tamano, (nuevo) => {
-  form.precio = preciosPorTamano[nuevo] ?? undefined
 })
 
 watch(dialog, async (abierto) => {
@@ -103,19 +90,23 @@ const cancelar = () => {
 }
 
 const guardar = async () => {
+  const { valid } = await formRef.value?.validate()
+
+  if (!valid) {
+    showToast('Por favor corrige los errores del formulario', 'warning')
+    return
+  }
+
   if (!form.cliente_id) {
     showToast('Debes buscar y seleccionar un cliente válido', 'warning')
     return
   }
-  if (!form.tamano) {
-    showToast('Debes seleccionar un tamaño', 'warning')
-    return
-  }
+
   loading.value = true
   try {
     const nuevoPaquete = await registrarPaquete()
     emit('paqueteCreado', nuevoPaquete)
-    showToast(`¡Paquete registrado con éxito!`, 'success')
+    showToast('¡Paquete registrado con éxito!', 'success')
     cancelar()
   } catch (error: any) {
     showToast(error.message || 'Error de conexión con el servidor', 'error')
@@ -145,7 +136,7 @@ const guardar = async () => {
 
       <v-form ref="formRef" @submit.prevent="guardar" class="modal-form">
 
-        <!-- Correo del cliente (ancho completo) -->
+        <!-- Correo del cliente -->
         <div class="form-group full-width">
           <label class="form-label">
             Correo del Cliente <span class="required">*</span>
@@ -166,7 +157,6 @@ const guardar = async () => {
               </v-btn>
             </template>
           </v-text-field>
-          <!-- Nombre del cliente debajo del correo -->
           <div class="cliente-info" v-if="nombreCliente">
             <v-icon size="14" color="success">mdi-check-circle</v-icon>
             <span>{{ nombreCliente }}</span>
@@ -186,10 +176,11 @@ const guardar = async () => {
               :items="tamanioOpciones"
               item-title="title"
               item-value="value"
-              placeholder="Seleccionar tamaño de paquete"
+              placeholder="Seleccionar tamaño"
               variant="outlined"
               density="comfortable"
               hide-details="auto"
+              :rules="[validate('tamano')]"
             />
           </div>
           <div class="form-group">
@@ -199,10 +190,11 @@ const guardar = async () => {
               :items="formaOpciones"
               item-title="title"
               item-value="value"
-              placeholder="Seleccionar forma de paquete"
+              placeholder="Seleccionar forma"
               variant="outlined"
               density="comfortable"
               hide-details="auto"
+              :rules="[validate('forma')]"
             />
           </div>
         </div>
@@ -219,6 +211,7 @@ const guardar = async () => {
               density="comfortable"
               hide-details="auto"
               suffix="KG"
+              :rules="[validate('peso')]"
             />
           </div>
           <div class="form-group">
@@ -226,7 +219,7 @@ const guardar = async () => {
             <div class="precio-label" :class="{ 'precio-activo': precioCalculado !== null }">
               <v-icon size="16">mdi-currency-usd</v-icon>
               <span v-if="precioCalculado !== null">{{ precioCalculado }}.00 MXN</span>
-              <span v-else class="text-grey">Se calcula según el tamaño</span>
+              <span v-else class="text-grey">0.00 MXN</span>
             </div>
           </div>
         </div>
@@ -243,7 +236,7 @@ const guardar = async () => {
       </v-form>
 
       <div class="modal-footer">
-        <span>© 2026 NovaCode. All rights reserved. System Status: Optimal.</span>
+        <span>© 2026 NovaCode.</span>
       </div>
 
     </v-card>

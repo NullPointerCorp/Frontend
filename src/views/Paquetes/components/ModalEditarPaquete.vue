@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useEditarPaquete } from '@/composables/useEditarPaquete'
 import type { Paquete } from '@/types/paquete.types'
 
 const emit = defineEmits<{ (e: 'paqueteEditado', paquete: Paquete): void }>()
 
-const { dialog, loading, errorMessage, form, paqueteSeleccionado, abrirModal, editarPaquete } =
+const { dialog, loading, errorMessage, form, paqueteSeleccionado, abrirModal, editarPaquete, validate, preciosPorTamano } =
   useEditarPaquete((paquete) => emit('paqueteEditado', paquete))
+
+const formRef = ref()
 
 const tamanioOpciones = [
   { title: 'Pequeño', value: 'Pequeño' },
@@ -16,9 +18,9 @@ const tamanioOpciones = [
 ]
 
 const formaOpciones = [
-  { title: 'Cuadrada', value: 'cuadrada' },
-  { title: 'Rectangular', value: 'rectangular' },
-  { title: 'Circular', value: 'circular' },
+  { title: 'Cuadrada', value: 'Cuadrada' },
+  { title: 'Rectangular', value: 'Rectangular' },
+  { title: 'Circular', value: 'Circular' },
 ]
 
 const precioCalculado = computed(() => {
@@ -28,7 +30,7 @@ const precioCalculado = computed(() => {
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return
   if (e.key === 'Escape') dialog.value = false
-  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) editarPaquete()
+  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) editarPaquete(formRef.value)
 }
 
 onMounted(() => window.addEventListener('keydown', handleKeydown))
@@ -50,7 +52,7 @@ defineExpose({ abrirModal })
         <p class="modal-subtitle">Actualice la información del paquete.</p>
       </div>
 
-      <div class="modal-form">
+      <v-form ref="formRef" @submit.prevent="editarPaquete(formRef)" class="modal-form">
 
         <!-- Folio y Cliente (readonly) -->
         <div class="form-row">
@@ -76,6 +78,7 @@ defineExpose({ abrirModal })
               variant="outlined"
               density="comfortable"
               hide-details="auto"
+              :rules="[validate('tamano')]"
             />
           </div>
           <div class="form-group">
@@ -88,6 +91,7 @@ defineExpose({ abrirModal })
               variant="outlined"
               density="comfortable"
               hide-details="auto"
+              :rules="[validate('forma')]"
             />
           </div>
         </div>
@@ -103,6 +107,7 @@ defineExpose({ abrirModal })
               density="comfortable"
               hide-details="auto"
               suffix="KG"
+              :rules="[validate('peso')]"
             />
           </div>
           <div class="form-group">
@@ -110,25 +115,25 @@ defineExpose({ abrirModal })
             <div class="precio-label" :class="{ 'precio-activo': precioCalculado !== null }">
               <v-icon size="16">mdi-currency-usd</v-icon>
               <span v-if="precioCalculado !== null">{{ precioCalculado }}.00 MXN</span>
-              <span v-else class="text-grey">Se calcula según el tamaño</span>
+              <span v-else class="text-grey">0.00 MXN</span>
             </div>
           </div>
         </div>
 
         <p v-if="errorMessage" class="text-red text-sm mt-1">{{ errorMessage }}</p>
 
-      </div>
+        <div class="modal-actions">
+          <v-btn class="cancel-btn" variant="outlined" type="button" @click="dialog = false" :disabled="loading">
+            <v-icon start>mdi-close</v-icon> Cancelar
+          </v-btn>
+          <v-btn class="save-btn" type="submit" :loading="loading">
+            <v-icon start>mdi-content-save-outline</v-icon> Guardar Paquete
+          </v-btn>
+        </div>
 
-      <div class="modal-actions">
-        <v-btn class="cancel-btn" variant="outlined" type="button" @click="dialog = false" :disabled="loading">
-          <v-icon start>mdi-close</v-icon> Cancelar
-        </v-btn>
-        <v-btn class="save-btn" :loading="loading" @click="editarPaquete">
-          <v-icon start>mdi-content-save-outline</v-icon> Guardar Paquete
-        </v-btn>
-      </div>
+      </v-form>
 
-      <div class="modal-footer"><span>© 2026 NovaLogistics.</span></div>
+      <div class="modal-footer"><span>© 2026 NovaCode.</span></div>
     </v-card>
   </v-dialog>
 </template>

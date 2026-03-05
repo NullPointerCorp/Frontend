@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
-import { useRegistrarAlmacen } from "@/composables/useRegistrarAlmacen";
-import { useUbicacion } from '@/composables/useubicacion'
+import { useRegistrarAlmacen } from "@/composables/useRegistrarAlmacen"
+import { useUbicacion } from '@/composables/useUbicacion'
 import { useToast } from '@/composables/useToast'
 import type { Almacen } from '@/types/almacen.types'
 
 const { showToast } = useToast()
-const { form, resetForm, registrarAlmacen } = useRegistrarAlmacen()
+const { form, resetForm, registrarAlmacen, validate } = useRegistrarAlmacen()
 const {
-  estados, ciudades, sucursalesOpciones,
-  loadingEstados, loadingCiudades, loadingSucursales,
-  estadoSeleccionado, ciudadSeleccionada,
+  estados,
+  ciudades,
+  sucursalesOpciones,
+  loadingEstados,
+  loadingCiudades,
+  loadingSucursales,
+  estadoSeleccionado,
+  ciudadSeleccionada,
   fetchEstados,
 } = useUbicacion()
 
@@ -31,7 +36,6 @@ watch(dialog, async (abierto) => {
   }
 })
 
-// Cuando cambia la ciudad limpia la sucursal seleccionada
 watch(ciudadSeleccionada, (nuevo, anterior) => {
   if (anterior !== null) form.sucursal_id = null
 })
@@ -56,6 +60,13 @@ const cancelar = () => {
 }
 
 const guardar = async () => {
+  const { valid } = await formRef.value?.validate()
+
+  if (!valid) {
+    showToast('Por favor corrige los errores del formulario', 'warning')
+    return
+  }
+
   loading.value = true
   try {
     const nuevoAlmacen = await registrarAlmacen()
@@ -79,7 +90,6 @@ const guardar = async () => {
   <v-dialog v-model="dialog" max-width="600" persistent>
     <v-card class="modal-card" theme="light">
 
-      <!-- Header -->
       <div class="modal-header">
         <button class="back-link" type="button" @click="cancelar">
           <v-icon size="18">mdi-chevron-left</v-icon>
@@ -91,7 +101,6 @@ const guardar = async () => {
         </p>
       </div>
 
-      <!-- Form -->
       <v-form ref="formRef" @submit.prevent="guardar" class="modal-form">
 
         <!-- Nombre -->
@@ -106,6 +115,7 @@ const guardar = async () => {
             variant="outlined"
             density="comfortable"
             hide-details="auto"
+            :rules="[validate('nombre_almacen')]"
           />
         </div>
 
@@ -158,6 +168,7 @@ const guardar = async () => {
             hide-details="auto"
             :loading="loadingSucursales"
             :disabled="!ciudadSeleccionada"
+            :rules="[validate('sucursal_id')]"
           />
         </div>
 
@@ -166,14 +177,13 @@ const guardar = async () => {
           <label class="form-label">Descripción</label>
           <v-text-field
             v-model="form.descripcion"
-            placeholder="Esta almacén ..."
+            placeholder="Este almacén ..."
             variant="outlined"
             density="comfortable"
             hide-details="auto"
           />
         </div>
 
-        <!-- Actions -->
         <div class="modal-actions">
           <v-btn variant="outlined" class="cancel-btn" type="button" @click="cancelar" :disabled="loading">
             <v-icon start>mdi-close</v-icon>
@@ -187,9 +197,8 @@ const guardar = async () => {
 
       </v-form>
 
-      <!-- Footer -->
       <div class="modal-footer">
-        <span>© 2026 NovaLogistics.</span>
+        <span>© 2026 NovaCode.</span>
       </div>
 
     </v-card>

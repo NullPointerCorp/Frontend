@@ -1,10 +1,14 @@
 import { ref } from "vue";
 import type { Cliente } from "@/types/cliente.types";
-
+import { useZodValidation } from "@/composables/useZodValidation";
+import { actualizarClienteSchema } from "@/schemas/cliente.schema";
 import { useToast } from '@/composables/useToast'
+
 const { showToast } = useToast()
 
 export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
+  const { validate, validateAll } = useZodValidation(actualizarClienteSchema)
+
   const dialog = ref(false);
   const loading = ref(false);
   const errorMessage = ref("");
@@ -25,20 +29,38 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
       cliente_id: cliente.cliente_id,
       nombre: cliente.nombre,
       apellido_paterno: cliente.apellido_paterno,
-      apellido_materno: cliente.apellido_materno,
+      apellido_materno: cliente.apellido_materno ?? "",
       correo: cliente.correo,
-      telefono: cliente.telefono,
+      telefono: cliente.telefono ?? "",
     };
     dialog.value = true;
   };
 
+  const prepararDatos = () => ({
+    nombre: form.value.nombre.trim(),
+    apellido_paterno: form.value.apellido_paterno.trim(),
+    apellido_materno: form.value.apellido_materno.trim() || null,
+    telefono: form.value.telefono.trim() || null,
+  });
+
   const editarCliente = async () => {
     if (!clienteSeleccionado.value) return;
+
+    const { success } = validateAll(form.value)
+    if (!success) {
+      showToast('Por favor corrige los errores del formulario', 'warning')
+      return
+    }
+
     loading.value = true;
     errorMessage.value = "";
 
     try {
       const token = localStorage.getItem("token");
+      const datos = prepararDatos();
+      
+      console.log('Enviando:', datos); // Para debuggear
+      
       const response = await fetch(
         `http://localhost:3000/clientes/${clienteSeleccionado.value.cliente_id}`,
         {
@@ -47,7 +69,7 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(form.value),
+          body: JSON.stringify(datos),
         },
       );
 
@@ -57,8 +79,8 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
         errorMessage.value = data.message || "Error al actualizar cliente";
         return;
       }
- 
-      onSuccess({ ...form.value });
+
+      onSuccess(data);
       showToast(`¡Cliente modificado con éxito!`, 'success');
       dialog.value = false;
     } catch (error) {
@@ -76,5 +98,6 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
     clienteSeleccionado,
     abrirModal,
     editarCliente,
+    validate,
   };
 };

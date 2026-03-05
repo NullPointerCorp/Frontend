@@ -27,7 +27,7 @@ const logout = () => {
   <v-navigation-drawer permanent>
     <div class="sidebar-header">
       <img :src="logo" alt="NovaLogistics Logo" class="login-logo" />
-      <span class="sidebar-logo-text">NovaLogistics</span>
+      <span class="sidebar-logo-text">NovaCode</span>
     </div>
     <v-list nav>
       <v-list-item

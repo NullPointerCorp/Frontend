@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useEditarSucursal } from '@/composables/useEditarSucursal'
-import { useUbicacion } from '@/composables/useubicacion'
+import { useUbicacion } from '@/composables/useUbicacion'
 import type { Sucursal } from '@/types/sucursal.types'
 
 const emit = defineEmits<{ (e: 'sucursalEditada', sucursal: Sucursal): void }>()
 
-const { dialog, loading, errorMessage, form, sucursalSeleccionada, abrirModal, editarSucursal } =
+const { dialog, loading, errorMessage, form, sucursalSeleccionada, abrirModal, editarSucursal, validate } =
   useEditarSucursal((sucursal) => emit('sucursalEditada', sucursal))
 
-const {
-  supervisores,
-  loadingSupervisores,
-  fetchSupervisores,
-} = useUbicacion()
+const { supervisores, loadingSupervisores, fetchSupervisores } = useUbicacion()
+
+const formRef = ref()
 
 watch(dialog, async (abierto) => {
   if (abierto) {
@@ -25,7 +23,7 @@ watch(dialog, async (abierto) => {
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return
   if (e.key === 'Escape') dialog.value = false
-  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) editarSucursal()
+  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) editarSucursal(formRef.value)
 }
 
 onMounted(() => window.addEventListener('keydown', handleKeydown))
@@ -44,34 +42,28 @@ defineExpose({ abrirModal })
           Volver al Catálogo
         </button>
         <h1 class="modal-title">Editar Sucursal</h1>
-        <p class="modal-subtitle">Actualice el nombre, localización y ubicación de una sede ya existente en el sistema.</p>
+        <p class="modal-subtitle">Actualice el nombre, localización y ubicación de una sede ya existente en el sistema.
+        </p>
       </div>
 
-      <div class="modal-form">
+      <v-form ref="formRef" @submit.prevent="editarSucursal(formRef)" class="modal-form">
 
-        <!-- Nombre y Gerente -->
+        <!-- Nombre y Supervisor -->
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">
               <v-icon size="14" class="label-icon">mdi-store-outline</v-icon>
               Nombre de la Sucursal <span class="required">*</span>
             </label>
-            <v-text-field v-model="form.nombre_sucursal" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field v-model="form.nombre_sucursal" variant="outlined" density="comfortable" hide-details="auto"
+              :rules="[validate('nombre_sucursal')]" />
           </div>
           <div class="form-group">
             <label class="form-label">Supervisor de sucursal (si aplica)</label>
-            <v-select
-              v-model="form.empleado_id_supervisor"
-              :items="supervisores"
-              :item-title="(g) => `${g.nombre} ${g.apellido_paterno}`"
-              item-value="empleado_id"
-              placeholder="Seleccionar supervisor"
-              variant="outlined"
-              density="comfortable"
-              hide-details="auto"
-              :loading="loadingSupervisores"
-              clearable
-            />
+            <v-select v-model="form.empleado_id_supervisor" :items="supervisores"
+              :item-title="(s: any) => `${s.nombre} ${s.apellido_paterno}`" item-value="empleado_id"
+              placeholder="Seleccionar supervisor" variant="outlined" density="comfortable" hide-details="auto"
+              :loading="loadingSupervisores" clearable />
           </div>
         </div>
 
@@ -97,15 +89,18 @@ defineExpose({ abrirModal })
         <div class="form-row-three">
           <div class="form-group">
             <label class="form-label">Colonia <span class="required">*</span></label>
-            <v-text-field v-model="form.colonia" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field v-model="form.colonia" variant="outlined" density="comfortable" hide-details="auto"
+              :rules="[validate('colonia')]" />
           </div>
           <div class="form-group">
             <label class="form-label">Código Postal <span class="required">*</span></label>
-            <v-text-field v-model="form.codigo_postal" variant="outlined" density="comfortable" hide-details="auto" maxlength="5" />
+            <v-text-field v-model="form.codigo_postal" variant="outlined" density="comfortable" hide-details="auto"
+              maxlength="5" :rules="[validate('codigo_postal')]" />
           </div>
           <div class="form-group">
             <label class="form-label">Calle <span class="required">*</span></label>
-            <v-text-field v-model="form.calle" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field v-model="form.calle" variant="outlined" density="comfortable" hide-details="auto"
+              :rules="[validate('calle')]" />
           </div>
         </div>
 
@@ -113,7 +108,8 @@ defineExpose({ abrirModal })
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Numero Exterior <span class="required">*</span></label>
-            <v-text-field v-model="form.numero_exterior" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field v-model="form.numero_exterior" variant="outlined" density="comfortable" hide-details="auto"
+              :rules="[validate('numero_exterior')]" />
           </div>
           <div class="form-group">
             <label class="form-label">Numero Interior</label>
@@ -131,29 +127,31 @@ defineExpose({ abrirModal })
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Longitud</label>
-            <v-text-field v-model.number="form.longitud" type="number" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field v-model.number="form.longitud" type="number" variant="outlined" density="comfortable"
+              hide-details="auto" />
           </div>
           <div class="form-group">
             <label class="form-label">Latitud</label>
-            <v-text-field v-model.number="form.latitud" type="number" variant="outlined" density="comfortable" hide-details="auto" />
+            <v-text-field v-model.number="form.latitud" type="number" variant="outlined" density="comfortable"
+              hide-details="auto" />
           </div>
         </div>
 
         <p v-if="errorMessage" class="text-red text-sm mt-1">{{ errorMessage }}</p>
 
-      </div>
+        <div class="modal-actions">
+          <v-btn class="cancel-btn" variant="outlined" type="button" @click="dialog = false" :disabled="loading">
+            <v-icon start>mdi-close</v-icon> Cancelar
+          </v-btn>
+          <v-btn class="save-btn" type="submit" :loading="loading">
+            <v-icon start>mdi-content-save-outline</v-icon> Confirmar
+          </v-btn>
+        </div>
 
-      <div class="modal-actions">
-        <v-btn class="cancel-btn" variant="outlined" type="button" @click="dialog = false" :disabled="loading">
-          <v-icon start>mdi-close</v-icon> Cancelar
-        </v-btn>
-        <v-btn class="save-btn" :loading="loading" @click="editarSucursal">
-          <v-icon start>mdi-content-save-outline</v-icon> Confirmar
-        </v-btn>
-      </div>
+      </v-form>
 
       <div class="modal-footer">
-        <span>© 2026 NovaLogistics.</span>
+        <span>© 2026 NovaCode.</span>
       </div>
 
     </v-card>

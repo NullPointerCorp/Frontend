@@ -22,15 +22,27 @@ export const useRegistrarCliente = () => {
     form.telefono = ''
   }
 
+  const prepararDatos = () => ({
+    nombre: form.nombre.trim(),
+    apellido_paterno: form.apellido_paterno.trim(),
+    apellido_materno: form.apellido_materno.trim() || null,
+    correo: form.correo.trim().toLowerCase(),
+    telefono: form.telefono.trim() || null,
+  })
+
   const registrarCliente = async (): Promise<Cliente> => {
     const token = localStorage.getItem('token')
+    const datos = prepararDatos()
+    
+    console.log('Enviando:', datos)
+    
     const response = await fetch('http://localhost:3000/clientes/nuevo', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(form),
+      body: JSON.stringify(datos),
     })
 
     const data = await response.json()
