@@ -3,17 +3,20 @@ import { useLogin } from "./useLogin";
 import logo from "@/assets/images/novacodepng.png";
 import "./login.style.css";
 
-const { email, password, errorMessage, isFormValid, login } = useLogin();
+const { email, password, errorMessage, isFormValid, loading, login } = useLogin();
 </script>
 
 <template>
   <v-app>
     <v-main class="login-background">
       <v-card class="login-card" theme="light">
-        <!-- Header -->
+        
+        <!-- Header con logo mejorado -->
         <div class="login-header">
-          <img :src="logo" alt="NovaLogistics Logo" class="login-logo" />
-          <h1 class="login-title">NovaLogistics</h1>
+          <div class="logo-container">
+            <img :src="logo" alt="NovaLogistics Logo" class="login-logo" />
+          </div>
+          <h1 class="login-title">NovaCode</h1>
           <p class="login-subtitle">
             Ingresa tus credenciales para acceder al sistema
           </p>
@@ -30,6 +33,7 @@ const { email, password, errorMessage, isFormValid, login } = useLogin();
               density="comfortable"
               prepend-inner-icon="mdi-email-outline"
               hide-details
+              :disabled="loading"
             />
           </div>
 
@@ -43,28 +47,39 @@ const { email, password, errorMessage, isFormValid, login } = useLogin();
               density="comfortable"
               prepend-inner-icon="mdi-lock-outline"
               hide-details
+              :disabled="loading"
             />
           </div>
 
-          <!-- Error -->
-          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+          <!-- Error con mejor formato -->
+          <Transition name="fade">
+            <div v-if="errorMessage" class="error-container">
+              <v-icon size="18" color="error">mdi-alert-circle-outline</v-icon>
+              <span>{{ errorMessage }}</span>
+            </div>
+          </Transition>
 
-          <!-- Botón -->
-          <v-btn
-            :disabled="!isFormValid"
-            type="submit"
-            block
-            size="large"
-            class="login-btn"
-          >
-            Iniciar Sesión
-          </v-btn>
+          <!-- Botón aparece solo cuando ambos campos tienen texto -->
+          <Transition name="slide-fade">
+            <v-btn
+              v-if="isFormValid"
+              type="submit"
+              block
+              size="large"
+              class="login-btn"
+              :loading="loading"
+            >
+              <v-icon start>mdi-login</v-icon>
+              Iniciar Sesión
+            </v-btn>
+          </Transition>
+
         </v-form>
       </v-card>
 
       <!-- Footer -->
       <div class="login-footer">
-        <span>NovaLogistics — Gestión de Logística</span>
+        <span>© 2026 NovaCode — Sistema de Logística</span>
       </div>
     </v-main>
   </v-app>

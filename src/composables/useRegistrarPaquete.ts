@@ -1,4 +1,6 @@
 import { reactive, watch } from 'vue'
+import { useZodValidation } from '@/composables/useZodValidation'
+import { paqueteSchema } from '@/schemas/paquete.schema'
 import type { Paquete } from '@/types/paquete.types'
 
 const preciosPorTamano: Record<string, number> = {
@@ -9,6 +11,8 @@ const preciosPorTamano: Record<string, number> = {
 }
 
 export const useRegistrarPaquete = () => {
+  const { validate } = useZodValidation(paqueteSchema)
+
   const form = reactive({
     cliente_id: null as number | null,
     tamano: '' as string,
@@ -29,20 +33,31 @@ export const useRegistrarPaquete = () => {
     form.peso = undefined
   }
 
+  const prepararDatos = () => ({
+    cliente_id: form.cliente_id,
+    tamano: form.tamano,
+    forma: form.forma,
+    precio: form.precio ?? null,
+    peso: form.peso ?? null,
+  })
+
   const registrarPaquete = async (): Promise<Paquete> => {
     const token = localStorage.getItem('token')
+    const datos = prepararDatos()
+
     const response = await fetch('http://localhost:3000/paquetes/nuevo', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(form),
+      body: JSON.stringify(datos),
     })
+
     const data = await response.json()
     if (!response.ok) throw new Error(data.message || 'Error al registrar paquete')
     return data
   }
 
-  return { form, resetForm, registrarPaquete, preciosPorTamano }
+  return { form, resetForm, registrarPaquete, validate, preciosPorTamano }
 }

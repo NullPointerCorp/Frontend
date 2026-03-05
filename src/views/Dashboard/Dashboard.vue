@@ -23,7 +23,7 @@ const { catalogItems, navigateTo } = useDashboard();
       <h1 class="page-title">Panel de Control</h1>
       <p class="page-subtitle">
         Bienvenido al centro operativo de
-        <span class="highlight">NovaLogistics</span>.
+        <span class="highlight">NovaCode</span>.
       </p>
 
       <div class="catalog-header">

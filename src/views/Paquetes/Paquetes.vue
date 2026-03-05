@@ -93,7 +93,7 @@ watch(search, () => { page.value = 1; });
         />
 
         <div class="page-footer">
-          <span>© 2026 NovaLogistics.</span>
+          <span>© 2026 NovaCode.</span>
         </div>
 
       </div>

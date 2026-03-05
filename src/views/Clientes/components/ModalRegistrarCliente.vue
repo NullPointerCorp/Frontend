@@ -5,7 +5,7 @@ import { useToast } from '@/composables/useToast'
 import type { Cliente } from '@/types/cliente.types'
 
 const { showToast } = useToast()
-const { form, resetForm, registrarCliente, validate, validateAll } = useRegistrarCliente()
+const { form, resetForm, registrarCliente, validate } = useRegistrarCliente()
 
 const emit = defineEmits<{
   clienteCreado: [cliente: Cliente]
@@ -16,7 +16,6 @@ const loading = ref(false)
 const formRef = ref()
 const nombreRef = ref()
 
-// Foco al primer campo cuando se abre el modal
 watch(dialog, async (abierto) => {
   if (abierto) {
     await nextTick()
@@ -24,7 +23,6 @@ watch(dialog, async (abierto) => {
   }
 })
 
-// Atajos de teclado
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return
   if (e.key === 'Escape') cancelar()
@@ -43,9 +41,9 @@ const cancelar = () => {
 }
 
 const guardar = async () => {
-  const { success } = validateAll(form)
+  const { valid } = await formRef.value?.validate()
 
-  if (!success) {
+  if (!valid) {
     showToast('Por favor corrige los errores del formulario', 'warning')
     return
   }
@@ -65,17 +63,14 @@ const guardar = async () => {
 </script>
 
 <template>
-  <!-- Botón para abrir -->
   <v-btn color="primary" class="register-btn" @click="dialog = true">
     <v-icon start>mdi-plus</v-icon>
     Registrar Nuevo Cliente
   </v-btn>
 
-  <!-- Modal -->
   <v-dialog v-model="dialog" max-width="600" persistent>
     <v-card class="modal-card" theme="light">
 
-      <!-- Header -->
       <div class="modal-header">
         <button class="back-link" type="button" @click="cancelar">
           <v-icon size="18">mdi-chevron-left</v-icon>
@@ -87,23 +82,15 @@ const guardar = async () => {
         </p>
       </div>
 
-      <!-- Form -->
-      <v-form ref="formRef" @submit.prevent="guardar" class="modal-form">
+      <v-form ref="formRef" @submit.prevent="guardar" validate-on="submit" class="modal-form">
 
         <!-- Nombre -->
         <div class="form-group full-width">
           <label class="form-label">
             Nombre(s) <span class="required">*</span>
           </label>
-          <v-text-field
-            ref="nombreRef"
-            v-model="form.nombre"
-            placeholder="Ej. Luis Enrique"
-            variant="outlined"
-            density="comfortable"
-            :rules="[validate('nombre')]"
-            hide-details="auto"
-          />
+          <v-text-field ref="nombreRef" v-model="form.nombre" placeholder="Ej. Luis Enrique" variant="outlined"
+            density="comfortable" :rules="[validate('nombre')]" hide-details="auto" />
         </div>
 
         <!-- Apellidos -->
@@ -112,25 +99,13 @@ const guardar = async () => {
             <label class="form-label">
               Apellido Paterno <span class="required">*</span>
             </label>
-            <v-text-field
-              v-model="form.apellido_paterno"
-              placeholder="Ej. Pérez"
-              variant="outlined"
-              density="comfortable"
-              :rules="[validate('apellido_paterno')]"
-              hide-details="auto"
-            />
+            <v-text-field v-model="form.apellido_paterno" placeholder="Ej. Pérez" variant="outlined"
+              density="comfortable" :rules="[validate('apellido_paterno')]" hide-details="auto" />
           </div>
           <div class="form-group">
             <label class="form-label">Apellido Materno</label>
-            <v-text-field
-              v-model="form.apellido_materno"
-              placeholder="Ej. López"
-              variant="outlined"
-              density="comfortable"
-              :rules="[validate('apellido_materno')]"
-              hide-details="auto"
-            />
+            <v-text-field v-model="form.apellido_materno" placeholder="Ej. López" variant="outlined"
+              density="comfortable" :rules="[validate('apellido_materno')]" hide-details="auto" />
           </div>
         </div>
 
@@ -141,33 +116,19 @@ const guardar = async () => {
               <v-icon size="16" class="label-icon">mdi-email-outline</v-icon>
               Correo Electrónico <span class="required">*</span>
             </label>
-            <v-text-field
-              v-model="form.correo"
-              placeholder="cliente@ejemplo.com"
-              variant="outlined"
-              density="comfortable"
-              :rules="[validate('correo')]"
-              hide-details="auto"
-            />
+            <v-text-field v-model="form.correo" placeholder="cliente@ejemplo.com" variant="outlined"
+              density="comfortable" :rules="[validate('correo')]" hide-details="auto" />
           </div>
           <div class="form-group">
             <label class="form-label">
               <v-icon size="16" class="label-icon">mdi-phone-outline</v-icon>
               Teléfono de Contacto <span class="required">*</span>
             </label>
-            <v-text-field
-              v-model="form.telefono"
-              placeholder="1234567890"
-              variant="outlined"
-              density="comfortable"
-              :rules="[validate('telefono')]"
-              hide-details="auto"
-              maxlength="10"
-            />
+            <v-text-field v-model="form.telefono" placeholder="1234567890" variant="outlined" density="comfortable"
+              :rules="[validate('telefono')]" hide-details="auto" maxlength="10" />
           </div>
         </div>
 
-        <!-- Actions -->
         <div class="modal-actions">
           <v-btn variant="outlined" class="cancel-btn" type="button" @click="cancelar" :disabled="loading">
             <v-icon start>mdi-close</v-icon>
@@ -181,9 +142,8 @@ const guardar = async () => {
 
       </v-form>
 
-      <!-- Footer -->
       <div class="modal-footer">
-        <span>© 2026 NovaLogistics.</span>
+        <span>© 2026 NovaCode.</span>
       </div>
 
     </v-card>
