@@ -1,6 +1,8 @@
 import { ref } from 'vue'
 import type { Transporte } from '@/types/transporte.types'
 import { useToast } from '@/composables/useToast'
+import { useZodValidation } from '@/composables/useZodValidation'
+import { actualizarTransporteSchema } from '@/schemas/transporte.schema'
 
 const { showToast } = useToast()
 
@@ -11,6 +13,8 @@ export interface Transportista {
 }
 
 export const useEditarTransporte = (onSuccess: (transporte: Transporte) => void) => {
+  const { validate } = useZodValidation(actualizarTransporteSchema)
+
   const dialog = ref(false)
   const loading = ref(false)
   const errorMessage = ref('')
@@ -45,7 +49,7 @@ export const useEditarTransporte = (onSuccess: (transporte: Transporte) => void)
     form.value = {
       numero_serie: transporte.numero_serie,
       empleado_id: transporte.empleado_id,
-      capacidad_carga: transporte.capacidad_carga,
+      capacidad_carga: Number(transporte.capacidad_carga),       
       unidad_medida: transporte.unidad_medida,
       placa: transporte.placa || '',
     }
@@ -53,8 +57,14 @@ export const useEditarTransporte = (onSuccess: (transporte: Transporte) => void)
     dialog.value = true
   }
 
-  const editarTransporte = async () => {
+  const editarTransporte = async (formRef?: any) => {
     if (!transporteSeleccionado.value) return
+
+    if (formRef) {
+      const { valid } = await formRef.validate()
+      if (!valid) return
+    }
+
     loading.value = true
     errorMessage.value = ''
 
@@ -104,5 +114,6 @@ export const useEditarTransporte = (onSuccess: (transporte: Transporte) => void)
     loadingTransportistas,
     abrirModal,
     editarTransporte,
+    validate,
   }
 }

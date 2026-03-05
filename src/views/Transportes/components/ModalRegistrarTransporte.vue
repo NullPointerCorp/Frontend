@@ -18,6 +18,7 @@ const {
   fetchTipos,
   fetchSubtipos,
   fetchTransportistas,
+  validate,
 } = useRegistrarTransporte()
 
 const emit = defineEmits<{ transporteCreado: [transporte: Transporte] }>()
@@ -27,7 +28,7 @@ const loading = ref(false)
 const formRef = ref()
 const numeroSerieRef = ref()
 
-const unidadesMedida = ['kg', 'ton']
+const unidadesMedida = ['kg', 'ton', 'lb']
 
 watch(dialog, async (abierto) => {
   if (abierto) {
@@ -54,8 +55,10 @@ const cancelar = () => {
 }
 
 const guardar = async () => {
-  if (!form.numero_serie || !form.empleado_id || !form.subtipo_id || !form.capacidad_carga || !form.unidad_medida) {
-    showToast('Por favor completa los campos obligatorios', 'warning')
+  const { valid } = await formRef.value?.validate()
+
+  if (!valid) {
+    showToast('Por favor corrige los errores del formulario', 'warning')
     return
   }
 
@@ -110,6 +113,7 @@ const guardar = async () => {
             variant="outlined"
             density="comfortable"
             hide-details="auto"
+            :rules="[validate('numero_serie')]"
           />
         </div>
 
@@ -127,6 +131,7 @@ const guardar = async () => {
             hide-details="auto"
             :loading="loadingTipos"
             clearable
+            :rules="[validate('tipo_id')]"
           />
         </div>
 
@@ -146,6 +151,7 @@ const guardar = async () => {
               density="comfortable"
               hide-details="auto"
               :loading="loadingTransportistas"
+              :rules="[validate('empleado_id')]"
             />
           </div>
           <div class="form-group">
@@ -161,6 +167,7 @@ const guardar = async () => {
               hide-details="auto"
               :loading="loadingSubtipos"
               :disabled="!form.tipo_id"
+              :rules="[validate('subtipo_id')]"
             />
           </div>
         </div>
@@ -178,6 +185,7 @@ const guardar = async () => {
               variant="outlined"
               density="comfortable"
               hide-details="auto"
+              :rules="[validate('capacidad_carga')]"
             />
           </div>
           <div class="form-group">
@@ -189,6 +197,7 @@ const guardar = async () => {
               variant="outlined"
               density="comfortable"
               hide-details="auto"
+              :rules="[validate('unidad_medida')]"
             />
           </div>
         </div>
@@ -202,6 +211,7 @@ const guardar = async () => {
             variant="outlined"
             density="comfortable"
             hide-details="auto"
+            :rules="[validate('placa')]"
           />
         </div>
 

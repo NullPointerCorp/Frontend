@@ -1,4 +1,6 @@
 import { reactive, ref, watch } from 'vue'
+import { useZodValidation } from '@/composables/useZodValidation'
+import { transporteSchema } from '@/schemas/transporte.schema'
 import type { Transporte } from '@/types/transporte.types'
 
 export interface TipoTransporte {
@@ -19,6 +21,8 @@ export interface Transportista {
 }
 
 export const useRegistrarTransporte = () => {
+  const { validate } = useZodValidation(transporteSchema)
+    
   const form = reactive({
     numero_serie: '',
     empleado_id: null as number | null,
@@ -133,5 +137,6 @@ export const useRegistrarTransporte = () => {
     fetchTipos,
     fetchSubtipos,
     fetchTransportistas,
+    validate,
   }
 }

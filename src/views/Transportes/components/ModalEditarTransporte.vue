@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useEditarTransporte } from '@/composables/useEditarTransporte'
 import type { Transporte } from '@/types/transporte.types'
 
@@ -15,16 +15,19 @@ const {
   loadingTransportistas,
   abrirModal,
   editarTransporte,
+  validate,
 } = useEditarTransporte((transporte) => {
   emit('transporteEditado', transporte)
 })
 
-const unidadesMedida = ['kg', 'ton']
+const formRef = ref()
+
+const unidadesMedida = ['kg', 'ton', 'lb']
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return
   if (e.key === 'Escape') dialog.value = false
-  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) editarTransporte()
+  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) editarTransporte(formRef.value)
 }
 
 onMounted(() => window.addEventListener('keydown', handleKeydown))
@@ -46,7 +49,7 @@ defineExpose({ abrirModal })
         <p class="modal-subtitle">Actualice los datos de un transporte ya existente en el sistema.</p>
       </div>
 
-      <div class="modal-form">
+      <v-form ref="formRef" @submit.prevent="editarTransporte(formRef)" class="modal-form">
 
         <div class="form-section-title">
           <v-icon size="16">mdi-truck-outline</v-icon>
@@ -72,6 +75,7 @@ defineExpose({ abrirModal })
             density="comfortable"
             hide-details="auto"
             :loading="loadingTransportistas"
+            :rules="[validate('empleado_id')]"
           />
         </div>
 
@@ -87,12 +91,15 @@ defineExpose({ abrirModal })
             variant="outlined"
             density="comfortable"
             hide-details="auto"
+            :rules="[validate('capacidad_carga')]"
           />
         </div>
 
         <!-- Unidad de Medida -->
         <div class="form-group full-width">
-          <label class="form-label">Unidad de Medida</label>
+          <label class="form-label">
+            Unidad de Medida <span class="required">*</span>
+          </label>
           <v-select
             v-model="form.unidad_medida"
             :items="unidadesMedida"
@@ -100,6 +107,7 @@ defineExpose({ abrirModal })
             variant="outlined"
             density="comfortable"
             hide-details="auto"
+            :rules="[validate('unidad_medida')]"
           />
         </div>
 
@@ -112,23 +120,24 @@ defineExpose({ abrirModal })
             variant="outlined"
             density="comfortable"
             hide-details="auto"
+            :rules="[validate('placa')]"
           />
         </div>
 
         <p v-if="errorMessage" class="text-red text-sm mt-1">{{ errorMessage }}</p>
 
-      </div>
+        <div class="modal-actions">
+          <v-btn class="cancel-btn" variant="outlined" type="button" @click="dialog = false" :disabled="loading">
+            <v-icon start>mdi-close</v-icon>
+            Cancelar
+          </v-btn>
+          <v-btn class="save-btn" type="submit" :loading="loading">
+            <v-icon start>mdi-content-save-outline</v-icon>
+            Confirmar
+          </v-btn>
+        </div>
 
-      <div class="modal-actions">
-        <v-btn class="cancel-btn" variant="outlined" type="button" @click="dialog = false" :disabled="loading">
-          <v-icon start>mdi-close</v-icon>
-          Cancelar
-        </v-btn>
-        <v-btn class="save-btn" :loading="loading" @click="editarTransporte">
-          <v-icon start>mdi-content-save-outline</v-icon>
-          Guardar Transporte
-        </v-btn>
-      </div>
+      </v-form>
 
       <div class="modal-footer">
         <span>© 2026 NovaLogistics.</span>
