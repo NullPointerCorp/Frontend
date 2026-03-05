@@ -7,7 +7,7 @@ import type { Sucursal } from '@/types/sucursal.types'
 
 const { showToast } = useToast()
 const { form, resetForm, registrarSucursal } = useRegistrarSucursal()
-const { estados, ciudades, supervisores, loadingSupervisores, supervisoreSeleccionado,
+const { estados, ciudades, supervisores, loadingSupervisores, supervisorSeleccionado,
         loadingEstados, loadingCiudades, estadoSeleccionado, fetchEstados, fetchSupervisores } = useUbicacion()
 
 const emit = defineEmits<{
@@ -106,7 +106,6 @@ const guardar = async () => {
               v-model="form.empleado_id_supervisor"
               :items="supervisores"
               :item-title="(g) => `${g.nombre} ${g.apellido_paterno}`"
-              item-title="nombre"
               item-value="empleado_id"
               placeholder="Seleccionar supervisor"
               variant="outlined"

@@ -84,7 +84,9 @@ export const useUbicacion = () => {
       const res = await fetch('http://localhost:3000/empleados/supervisores', {
         headers: { Authorization: `Bearer ${token}` }
       })
-      supervisores.value = await res.json()
+      const data = await res.json()
+      console.log("SUPERVISORES:", data)  // ← agrega esto
+      supervisores.value = data
     } finally {
       loadingSupervisores.value = false
     }

@@ -7,12 +7,13 @@ import { getAuth } from "firebase/auth";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAZl8-B7hJQrl83igJ2ofDthPvr6BLpHdc",
-  authDomain: "novalogistics-607d2.firebaseapp.com",
-  projectId: "novalogistics-607d2",
-  storageBucket: "novalogistics-607d2.firebasestorage.app",
-  messagingSenderId: "674523099681",
-  appId: "1:674523099681:web:b0ce3b2193cf772a5ca960"
+  apiKey: "AIzaSyDebGypTWk-qeJ6WylOIVAl0XEEprREkPE",
+  authDomain: "novacode-logistica.firebaseapp.com",
+  projectId: "novacode-logistica",
+  storageBucket: "novacode-logistica.firebasestorage.app",
+  messagingSenderId: "326329296490",
+  appId: "1:326329296490:web:cd0583b7b4e1169f91cc13",
+  measurementId: "G-RDRL2CHYJB"
 };
 
 // Initialize Firebase
