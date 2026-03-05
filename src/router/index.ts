@@ -7,8 +7,9 @@ import Dashboard from "../views/Dashboard/Dashboard.vue";
 
 import Sucursales from "@/views/Sucursales/Sucursales.vue";
 import Clientes from "@/views/Clientes/Clientes.vue";
-import Almacenes from "@/views/Almacenes/Almacen.vue"
 import Paquetes from "@/views/Paquetes/Paquetes.vue";
+import Almacenes from "@/views/Almacenes/Almacen.vue";
+import empleados from "@/views/Empleados/Empleados.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -27,6 +28,7 @@ const routes = [
       { path: "sucursales", component: Sucursales },
       { path: "almacenes", component: Almacenes },
       { path: "paquetes", component: Paquetes },
+      {path: "empleados", component: empleados}
     ]
   }
 ];
