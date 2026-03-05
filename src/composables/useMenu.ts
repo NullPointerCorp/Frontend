@@ -5,7 +5,7 @@ const allItems = [
   { icon: 'mdi-store', title: 'Sucursales', route: '/sucursales', roles: [1, 2] },
   { icon: 'mdi-warehouse', title: 'Almacenes', route: '/almacenes', roles: [1, 2] },
   { icon: 'mdi-badge-account', title: 'Empleados', route: '/empleados', roles: [1] },
-  { icon: 'mdi-truck', title: 'Transporte', route: '/transporte', roles: [1, 2] },
+  { icon: 'mdi-truck', title: 'Transportes', route: '/transportes', roles: [1, 2] },
   { icon: 'mdi-account-group', title: 'Clientes', route: '/clientes', roles: [1, 2] },
   { icon: 'mdi-package-variant-closed', title: 'Paquetes', route: '/paquetes', roles: [1, 2, 3] },
 ]

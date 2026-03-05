@@ -25,9 +25,9 @@ export function useDashboard() {
     },
     {
       icon: "mdi-truck",
-      title: "Transporte",
+      title: "Transportes",
       description: "Flota vehicular, rutas y mantenimientos preventivos.",
-      route: "/transporte",
+      route: "/transportes",
     },
     {
       icon: "mdi-account-group",
