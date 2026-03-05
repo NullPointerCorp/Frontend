@@ -11,7 +11,6 @@ const { email, password, errorMessage, isFormValid, loading, login } = useLogin(
     <v-main class="login-background">
       <v-card class="login-card" theme="light">
         
-        <!-- Header con logo mejorado -->
         <div class="login-header">
           <div class="logo-container">
             <img :src="logo" alt="NovaLogistics Logo" class="login-logo" />

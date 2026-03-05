@@ -49,8 +49,6 @@ export const useRegistrarSucursal = () => {
     const token = localStorage.getItem('token')
     const datos = prepararDatos()
 
-    console.log('Enviando:', datos) // Para verificar qué se envía
-
     const response = await fetch('http://localhost:3000/sucursales/nuevo', {
       method: 'POST',
       headers: {

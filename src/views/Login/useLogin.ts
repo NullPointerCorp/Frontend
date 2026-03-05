@@ -15,7 +15,6 @@ export const useLogin = () => {
   const errorMessage = ref<string>("");
   const loading = ref<boolean>(false);
 
-  // Botón visible solo cuando ambos campos tienen texto
   const isFormValid = computed(() => {
     return email.value.trim() !== "" && password.value !== "";
   });

@@ -59,8 +59,6 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
       const token = localStorage.getItem("token");
       const datos = prepararDatos();
       
-      console.log('Enviando:', datos); // Para debuggear
-      
       const response = await fetch(
         `http://localhost:3000/clientes/${clienteSeleccionado.value.cliente_id}`,
         {

@@ -17,7 +17,6 @@ export function useZodValidation<T extends z.ZodObject<any>>(schema: T) {
         return true;
       }
 
-      // Compatible con v3 (errors) y v4 (issues)
       const errorList = result.error.issues ?? (result.error as any).errors ?? [];
       return errorList[0]?.message || "Campo inválido";
     };

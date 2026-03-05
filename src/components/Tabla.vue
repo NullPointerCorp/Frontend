@@ -12,7 +12,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   editar: [item: any]
-  eliminar: [item: any]  // ← item completo
+  eliminar: [item: any]
   'update:page': [page: number]
 }>()
 

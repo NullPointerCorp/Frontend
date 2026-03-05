@@ -34,8 +34,6 @@ export const useRegistrarCliente = () => {
     const token = localStorage.getItem('token')
     const datos = prepararDatos()
     
-    console.log('Enviando:', datos)
-    
     const response = await fetch('http://localhost:3000/clientes/nuevo', {
       method: 'POST',
       headers: {

@@ -55,52 +55,56 @@ export const useEditarSucursal = (onSuccess: (sucursal: Sucursal) => void) => {
   })
 
   const editarSucursal = async (formRef: any) => {
-    const { valid } = await formRef?.validate()
+  const { valid } = await formRef?.validate()
 
-    if (!valid) {
-      showToast('Por favor corrige los errores del formulario', 'warning')
+  if (!valid) {
+    showToast('Por favor corrige los errores del formulario', 'warning')
+    return
+  }
+
+  if (!sucursalSeleccionada.value) return
+
+  loading.value = true
+  errorMessage.value = ''
+
+  try {
+    const token = localStorage.getItem('token')
+    const datos = prepararDatos()
+
+    const response = await fetch(
+      `http://localhost:3000/sucursales/${sucursalSeleccionada.value.sucursal_id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(datos),
+      }
+    )
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      errorMessage.value = data.message || 'Error al actualizar sucursal'
       return
     }
 
-    if (!sucursalSeleccionada.value) return
-
-    loading.value = true
-    errorMessage.value = ''
-
-    try {
-      const token = localStorage.getItem('token')
-      const datos = prepararDatos()
-
-      console.log('Enviando:', datos) // Para verificar
-
-      const response = await fetch(
-        `http://localhost:3000/sucursales/${sucursalSeleccionada.value.sucursal_id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(datos),
-        }
-      )
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        errorMessage.value = data.message || 'Error al actualizar sucursal'
-        return
-      }
-
-      onSuccess(data)
-      showToast('¡Sucursal modificada con éxito!', 'success')
-      dialog.value = false
-    } catch (error) {
-      errorMessage.value = 'Error al conectar con el servidor'
-    } finally {
-      loading.value = false
+    const sucursalActualizada = {
+      ...data,
+      nombre_estado: data.nombre_estado ?? sucursalSeleccionada.value.nombre_estado,
+      nombre_ciudad: data.nombre_ciudad ?? sucursalSeleccionada.value.nombre_ciudad,
     }
+
+    onSuccess(sucursalActualizada)
+    showToast('¡Sucursal modificada con éxito!', 'success')
+    dialog.value = false
+  } catch (error) {
+    errorMessage.value = 'Error al conectar con el servidor'
+  } finally {
+    loading.value = false
   }
+}
 
   return {
     dialog,

@@ -32,7 +32,6 @@ const {
 
 onMounted(fetchClientes);
 
-// Reseteamos la página cuando cambia el search
 watch(search, () => { page.value = 1; });
 </script>
 

@@ -7,7 +7,7 @@ defineEmits<{ (e: "aceptar"): void; (e: "cancelar"): void }>();
   <v-dialog :model-value="dialog" max-width="400" persistent>
     <v-card rounded="lg">
       <v-card-title class="pt-5 px-6">¿Estás seguro?</v-card-title>
-      <v-card-text class="px-6">{{ mensaje }}</v-card-text> <!-- ← cambiar subtitle por text -->
+      <v-card-text class="px-6">{{ mensaje }}</v-card-text> 
       <v-card-actions class="px-6 pb-5">
         <v-spacer />
         <v-btn variant="text" @click="$emit('cancelar')">Cancelar</v-btn>

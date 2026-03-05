@@ -85,7 +85,6 @@ export const useUbicacion = () => {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
-      console.log("SUPERVISORES:", data)  // ← agrega esto
       supervisores.value = data
     } finally {
       loadingSupervisores.value = false
