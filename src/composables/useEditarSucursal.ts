@@ -14,6 +14,7 @@ export const useEditarSucursal = (onSuccess: (sucursal: Sucursal) => void) => {
     sucursal_id: 0,
     nombre_sucursal: "",
     ciudad_id: 0,
+    empleado_id_supervisor: null as number | null,
     colonia: "",
     codigo_postal: "",
     calle: "",
@@ -29,6 +30,7 @@ export const useEditarSucursal = (onSuccess: (sucursal: Sucursal) => void) => {
       sucursal_id: sucursal.sucursal_id,
       nombre_sucursal: sucursal.nombre_sucursal,
       ciudad_id: sucursal.ciudad_id,
+      empleado_id_supervisor: sucursal.empleado_id_supervisor ?? null,
       colonia: sucursal.colonia,
       codigo_postal: sucursal.codigo_postal,
       calle: sucursal.calle,
@@ -67,10 +69,7 @@ export const useEditarSucursal = (onSuccess: (sucursal: Sucursal) => void) => {
       }
 
       onSuccess(data);
-      showToast(
-        `¡Sucursal modificada con éxito!`,
-        "success",
-      );
+      showToast(`¡Sucursal modificada con éxito!`, "success");
       dialog.value = false;
     } catch (error) {
       errorMessage.value = "Error al conectar con el servidor";

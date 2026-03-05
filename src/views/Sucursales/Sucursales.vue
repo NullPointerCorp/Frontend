@@ -62,50 +62,35 @@ watch(search, () => { page.value = 1; });
         <!-- Filtros -->
         <div class="filters-row">
           <div class="search-wrapper">
-            <v-text-field
-              v-model="search"
-              placeholder="Filtrar por nombre, ciudad..."
-              prepend-inner-icon="mdi-filter-variant"
-              variant="outlined"
-              density="compact"
-              hide-details
-              clearable
-              class="search-field"
-            />
+            <v-text-field v-model="search" placeholder="Filtrar por nombre, ciudad..."
+              prepend-inner-icon="mdi-filter-variant" variant="outlined" density="compact" hide-details clearable
+              class="search-field" />
           </div>
           <div class="items-per-page">
             <span>Mostrar:</span>
-            <v-select
-              v-model="limit"
-              :items="[5, 10, 25, 50]"
-              variant="outlined"
-              density="compact"
-              hide-details
-              class="items-select"
-            />
+            <v-select v-model="limit" :items="[5, 10, 25, 50]" variant="outlined" density="compact" hide-details
+              class="items-select" />
           </div>
         </div>
 
         <!-- Tabla -->
-        <Tabla item-key="sucursal_id"
-          :headers="[
-            { title: 'ID', key: 'sucursal_id' },
-            { title: 'Nombre', key: 'nombre_sucursal' },
-            { title: 'Ciudad', key: 'nombre_ciudad' },
-            { title: 'Colonia', key: 'colonia' },
-            { title: 'Calle', key: 'calle' },
-            { title: 'Acciones', key: 'acciones', sortable: false }
-          ]"
-          :items="sucursalesPaginadas"
-          :loading="loading"
-          :page="page"
-          :limit="limit"
-          :total-items="totalSucursales"
-          :total-paginas="totalPaginas"
-          @editar="modalEditar?.abrirModal($event)"
-          @eliminar="eliminarSucursal"
-          @update:page="page = $event"
-        />
+        <Tabla item-key="sucursal_id" :headers="[
+          { title: 'ID', key: 'sucursal_id' },
+          { title: 'Supervisor', key: 'nombre_supervisor' },
+          { title: 'Nombre', key: 'nombre_sucursal' },
+          { title: 'Estado', key: 'nombre_estado' },
+          { title: 'Ciudad', key: 'nombre_ciudad' },
+          { title: 'Colonia', key: 'colonia' },
+          { title: 'Código Postal', key: 'codigo_postal' },
+          { title: 'Calle', key: 'calle' },
+          { title: 'Núm. Exterior', key: 'numero_exterior' },
+          { title: 'Núm. Interior', key: 'numero_interior' },
+          { title: 'Longitud', key: 'longitud' },
+          { title: 'Latitud', key: 'latitud' },
+          { title: 'Acciones', key: 'acciones', sortable: false }
+        ]" :items="sucursalesPaginadas" :loading="loading" :page="page" :limit="limit" :total-items="totalSucursales"
+          :total-paginas="totalPaginas" @editar="modalEditar?.abrirModal($event)" @eliminar="eliminarSucursal"
+          @update:page="page = $event" />
 
         <!-- Footer -->
         <div class="page-footer">
@@ -115,12 +100,7 @@ watch(search, () => { page.value = 1; });
       </div>
 
       <!-- Modales -->
-      <ModalConfirmar
-  :dialog="dialogConfirmar"
-  :mensaje="mensajeConfirmar"
-  @aceptar="aceptar"
-  @cancelar="cancelar"
-/>
+      <ModalConfirmar :dialog="dialogConfirmar" :mensaje="mensajeConfirmar" @aceptar="aceptar" @cancelar="cancelar" />
       <ModalEditarSucursal ref="modalEditar" @sucursalEditada="actualizarSucursal" />
 
     </v-main>

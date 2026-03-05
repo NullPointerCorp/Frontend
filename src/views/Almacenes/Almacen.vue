@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from "vue";
-import { useClientes } from "@/composables/useClientes";
+import { useAlmacenes } from "@/composables/useAlmacenes";
 import { useAuthStore } from "../../stores/auth.store";
 
-import ModalRegistrarCliente from "./components/ModalRegistrarCliente.vue";
+import ModalRegistrarAlmacen from "./components/ModalRegistrarAlmacen.vue";
 import ModalConfirmar from "@/components/ModalConfirmar.vue";
-import ModalEditarCliente from "./components/ModalEditarCliente.vue";
+import ModalEditarAlmacen from "./components/ModalEditarAlmacen.vue";
 
 import Tabla from "@/components/Tabla.vue";
 
@@ -13,26 +13,24 @@ const authStore = useAuthStore();
 const modalEditar = ref<any>(null);
 
 const {
-  clientesPaginados,
+  almacenesPaginados,
   totalPaginas,
-  totalClientes,
+  totalAlmacenes,
   page,
   limit,
   search,
   loading,
-  fetchClientes,
-  agregarCliente,
-  actualizarCliente,
-  eliminarCliente,
+  fetchAlmacenes,
+  agregarAlmacen,
+  actualizarAlmacen,
+  eliminarAlmacen,
   dialogConfirmar,
   mensajeConfirmar,
   aceptar,
   cancelar,
-} = useClientes();
+} = useAlmacenes();
 
-onMounted(fetchClientes);
-
-// Reseteamos la página cuando cambia el search
+onMounted(fetchAlmacenes);
 watch(search, () => { page.value = 1; });
 </script>
 
@@ -56,18 +54,18 @@ watch(search, () => { page.value = 1; });
         <!-- Page Header -->
         <div class="page-header">
           <div>
-            <h1 class="page-title">Catálogo de Clientes</h1>
-            <p class="page-subtitle">Gestione la base de datos de clientes.</p>
+            <h1 class="page-title">Catálogo de Almacenes</h1>
+            <p class="page-subtitle">Gestione la base de datos de almacenes.</p>
           </div>
-          <ModalRegistrarCliente @clienteCreado="agregarCliente" />
+          <ModalRegistrarAlmacen @almacenCreado="agregarAlmacen" />
         </div>
 
         <!-- Filtros -->
         <div class="filters-row">
           <div class="search-wrapper">
-            <v-text-field v-model="search" placeholder="Filtrar por nombre, ID o ubicación..."
+            <v-text-field v-model="search" placeholder="Filtrar por nombre, sucursal..."
               prepend-inner-icon="mdi-filter-variant" variant="outlined" density="compact" hide-details
-              class="search-field" />
+              clearable class="search-field" />
           </div>
           <div class="items-per-page">
             <span>Mostrar:</span>
@@ -77,16 +75,14 @@ watch(search, () => { page.value = 1; });
         </div>
 
         <!-- Tabla -->
-        <Tabla item-key="cliente_id" :headers="[
-          { title: 'ID', key: 'cliente_id' },
-          { title: 'Nombre', key: 'nombre' },
-          { title: 'Apellido Paterno', key: 'apellido_paterno' },
-          { title: 'Apellido Materno', key: 'apellido_materno' },
-          { title: 'Correo', key: 'correo' },
-          { title: 'Teléfono', key: 'telefono' },
+        <Tabla item-key="almacen_id" :headers="[
+          { title: 'ID', key: 'almacen_id' },
+          { title: 'Nombre', key: 'nombre_almacen' },
+          { title: 'Sucursal', key: 'nombre_sucursal' },
+          { title: 'Descripción', key: 'descripcion' },
           { title: 'Acciones', key: 'acciones', sortable: false }
-        ]" :items="clientesPaginados" :loading="loading" :page="page" :limit="limit" :total-items="totalClientes"
-          :total-paginas="totalPaginas" @editar="modalEditar?.abrirModal($event)" @eliminar="eliminarCliente"
+        ]" :items="almacenesPaginados" :loading="loading" :page="page" :limit="limit" :total-items="totalAlmacenes"
+          :total-paginas="totalPaginas" @editar="modalEditar?.abrirModal($event)" @eliminar="eliminarAlmacen"
           @update:page="page = $event" />
 
         <!-- Footer -->
@@ -98,7 +94,7 @@ watch(search, () => { page.value = 1; });
 
       <!-- Modales -->
       <ModalConfirmar :dialog="dialogConfirmar" :mensaje="mensajeConfirmar" @aceptar="aceptar" @cancelar="cancelar" />
-      <ModalEditarCliente ref="modalEditar" @clienteEditado="actualizarCliente" />
+      <ModalEditarAlmacen ref="modalEditar" @almacenEditado="actualizarAlmacen" />
 
     </v-main>
   </v-app>

@@ -5,6 +5,7 @@ export const useRegistrarSucursal = () => {
   const form = reactive({
     nombre_sucursal: '',
     ciudad_id: null as number | null,
+    empleado_id_supervisor: null as number | null,
     colonia: '',
     codigo_postal: '',
     calle: '',
@@ -17,6 +18,7 @@ export const useRegistrarSucursal = () => {
   const resetForm = () => {
     form.nombre_sucursal = ''
     form.ciudad_id = null
+    form.empleado_id_supervisor = null
     form.colonia = ''
     form.codigo_postal = ''
     form.calle = ''
@@ -27,7 +29,7 @@ export const useRegistrarSucursal = () => {
   }
 
   const registrarSucursal = async (): Promise<Sucursal> => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token');
     const response = await fetch('http://localhost:3000/sucursales/nuevo', {
       method: 'POST',
       headers: {

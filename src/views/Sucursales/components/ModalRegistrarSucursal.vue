@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRegistrarSucursal } from '@/composables/useRegistrarSucursal'
-import { useUbicacion } from '@/composables/useubicacion'
+import { useUbicacion } from '@/composables/useUbicacion'
 import { useToast } from '@/composables/useToast'
 import type { Sucursal } from '@/types/sucursal.types'
 
 const { showToast } = useToast()
 const { form, resetForm, registrarSucursal } = useRegistrarSucursal()
-const { estados, ciudades, gerentes, loadingGerentes, gerenteSeleccionado,
-        loadingEstados, loadingCiudades, estadoSeleccionado, fetchEstados, fetchGerentes } = useUbicacion()
+const { estados, ciudades, supervisores, loadingSupervisores, supervisoreSeleccionado,
+        loadingEstados, loadingCiudades, estadoSeleccionado, fetchEstados, fetchSupervisores } = useUbicacion()
 
 const emit = defineEmits<{
   sucursalCreada: [sucursal: Sucursal]
@@ -23,7 +23,7 @@ watch(dialog, async (abierto) => {
   if (abierto) {
     await nextTick()
     nombreRef.value?.focus()
-    await Promise.all([fetchEstados(), fetchGerentes()])
+    await Promise.all([fetchEstados(), fetchSupervisores()])
   }
 })
 
@@ -101,17 +101,18 @@ const guardar = async () => {
             />
           </div>
           <div class="form-group">
-            <label class="form-label">Gerente (si aplica)</label>
+            <label class="form-label">Supervisor de sucursal (si aplica)</label>
             <v-select
-              v-model="gerenteSeleccionado"
-              :items="gerentes"
+              v-model="form.empleado_id_supervisor"
+              :items="supervisores"
+              :item-title="(g) => `${g.nombre} ${g.apellido_paterno}`"
               item-title="nombre"
               item-value="empleado_id"
-              placeholder="Seleccionar gerente"
+              placeholder="Seleccionar supervisor"
               variant="outlined"
               density="comfortable"
               hide-details="auto"
-              :loading="loadingGerentes"
+              :loading="loadingSupervisores"
             />
           </div>
         </div>
@@ -219,3 +220,5 @@ const guardar = async () => {
     </v-card>
   </v-dialog>
 </template>
+
+<style src="@/assets/styles/modal.style.css"></style>

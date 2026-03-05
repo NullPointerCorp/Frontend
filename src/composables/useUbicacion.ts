@@ -10,21 +10,31 @@ export interface Ciudad {
   nombre_ciudad: string
 }
 
-export interface Gerente {
+export interface Supervisor {
   empleado_id: number
   nombre: string
   apellido_paterno: string
 }
 
+export interface SucursalOpcion {
+  sucursal_id: number
+  nombre_sucursal: string
+}
+
 export const useUbicacion = () => {
   const estados = ref<Estado[]>([])
   const ciudades = ref<Ciudad[]>([])
-  const gerentes = ref<Gerente[]>([])
+  const sucursalesOpciones = ref<SucursalOpcion[]>([])
+  const supervisores = ref<Supervisor[]>([])
+
   const loadingEstados = ref(false)
   const loadingCiudades = ref(false)
-  const loadingGerentes = ref(false)
+  const loadingSucursales = ref(false)
+  const loadingSupervisores = ref(false)
+
   const estadoSeleccionado = ref<number | null>(null)
-  const gerenteSeleccionado = ref<number | null>(null)
+  const ciudadSeleccionada = ref<number | null>(null)
+  const supervisorSeleccionado = ref<number | null>(null)
 
   const fetchEstados = async () => {
     loadingEstados.value = true
@@ -53,35 +63,64 @@ export const useUbicacion = () => {
     }
   }
 
-  const fetchGerentes = async () => {
-    loadingGerentes.value = true
+  const fetchSucursalesPorCiudad = async (ciudad_id: number) => {
+    loadingSucursales.value = true
+    sucursalesOpciones.value = []
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch('http://localhost:3000/empleados/gerentes', {
+      const res = await fetch(`http://localhost:3000/sucursales/por-ciudad?ciudad_id=${ciudad_id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
-      gerentes.value = await res.json()
+      sucursalesOpciones.value = await res.json()
     } finally {
-      loadingGerentes.value = false
+      loadingSucursales.value = false
     }
   }
 
+  const fetchSupervisores = async () => {
+    loadingSupervisores.value = true
+    try {
+      const token = localStorage.getItem('token')
+      const res = await fetch('http://localhost:3000/empleados/supervisores', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      supervisores.value = await res.json()
+    } finally {
+      loadingSupervisores.value = false
+    }
+  }
+
+  // Cuando cambia el estado → limpia ciudad y sucursales
   watch(estadoSeleccionado, (nuevo, anterior) => {
+    if (anterior !== null) {
+      ciudadSeleccionada.value = null
+      sucursalesOpciones.value = []
+    }
     if (nuevo) fetchCiudades(nuevo)
     else ciudades.value = []
+  })
+
+  // Cuando cambia la ciudad → carga sucursales
+  watch(ciudadSeleccionada, (nuevo, anterior) => {
+    if (anterior !== null) sucursalesOpciones.value = []
+    if (nuevo) fetchSucursalesPorCiudad(nuevo)
   })
 
   return {
     estados,
     ciudades,
-    gerentes,
+    sucursalesOpciones,
+    supervisores,
     loadingEstados,
     loadingCiudades,
-    loadingGerentes,
+    loadingSucursales,
+    loadingSupervisores,
     estadoSeleccionado,
-    gerenteSeleccionado,
+    ciudadSeleccionada,
+    supervisorSeleccionado,
     fetchEstados,
     fetchCiudades,
-    fetchGerentes,
+    fetchSucursalesPorCiudad,
+    fetchSupervisores,
   }
 }
