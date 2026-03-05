@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useEditarSucursal } from '@/composables/useEditarSucursal'
-import { useUbicacion } from '@/composables/useubicacion'
+import { useUbicacion } from '@/composables/useUbicacion'
 import type { Sucursal } from '@/types/sucursal.types'
 
 const emit = defineEmits<{ (e: 'sucursalEditada', sucursal: Sucursal): void }>()

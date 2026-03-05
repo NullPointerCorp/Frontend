@@ -54,7 +54,7 @@ export const useSucursales = () => {
   });
 
   // Acciones
-  const fetchSucursales = async () => {
+  /*const fetchSucursales = async () => {
     loading.value = true;
     try {
       const token = localStorage.getItem("token");
@@ -74,7 +74,47 @@ export const useSucursales = () => {
     } finally {
       loading.value = false;
     }
-  };
+  };*/
+  const fetchSucursales = async () => {
+  loading.value = true;
+  try {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    const response = await fetch("http://localhost:3000/sucursales", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Solo redirigir si realmente es problema de auth/permisos
+    if (response.status === 401 || response.status === 403) {
+      router.push("/login");
+      return;
+    }
+
+    // Para 500 u otros errores, NO redirigir
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "");
+      console.error("Error al cargar sucursales:", response.status, errorText);
+      showToast(
+        `Error al cargar sucursales (HTTP ${response.status}). Revisa el backend.`,
+        "error"
+      );
+      return;
+    }
+
+    const data = await response.json();
+    todasLasSucursales.value = Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Error de red/red al obtener sucursales:", error);
+    showToast("No se pudo conectar con el servidor.", "error");
+  } finally {
+    loading.value = false;
+  }
+};
 
   const agregarSucursal = (sucursal: Sucursal) => {
     todasLasSucursales.value = [...todasLasSucursales.value, sucursal];

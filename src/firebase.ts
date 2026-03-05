@@ -1,4 +1,4 @@
-// Import the functions you need from the SDKs you need
+/*// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -18,4 +18,26 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);*/
+
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getAnalytics } from "firebase/analytics";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCPwETxFZTMwIP6EirqkG9Rl0Ago-CvGBw",
+  authDomain: "prueba-3f672.firebaseapp.com",
+  projectId: "prueba-3f672",
+  storageBucket: "prueba-3f672.firebasestorage.app",
+  messagingSenderId: "1086584707269",
+  appId: "1:1086584707269:web:b4f5b0719d63ae0638b8ac",
+  measurementId: "G-QPVFBQYVY3"
+};
+
+const app = initializeApp(firebaseConfig);
+
+// 🔹 esto es lo que te faltaba
 export const auth = getAuth(app);
+
+// analytics (opcional)
+const analytics = getAnalytics(app);
