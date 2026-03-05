@@ -51,7 +51,7 @@ watch(search, () => {
       <div class="content-wrapper">
         <div class="page-header">
           <div>
-            <h1 class="page-title">Catálogo de Transporte</h1>
+            <h1 class="page-title">Catálogo de Transportes</h1>
             <p class="page-subtitle">Gestión y monitoreo de la flota de vehículos de la red logística.</p>
           </div>
           <ModalRegistrarTransporte @transporteCreado="agregarTransporte" />
@@ -61,7 +61,7 @@ watch(search, () => {
           <div class="search-wrapper">
             <v-text-field
               v-model="search"
-              placeholder="Filtrar por nombre, o correo..."
+              placeholder="Filtrar por serie, transportista o placas..."
               prepend-inner-icon="mdi-filter-variant"
               variant="outlined"
               density="compact"

@@ -29,7 +29,7 @@ const routes = [
       { path: "sucursales", component: Sucursales },
       { path: "almacenes", component: Almacenes },
       { path: "paquetes", component: Paquetes },
-      { path: "transporte", component: Transportes },
+      { path: "transportes", component: Transportes },
     ]
   }
 ];
