@@ -85,7 +85,7 @@ defineExpose({ abrirModal })
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Estado</label>
-            <div class="readonly-field">{{ sucursalSeleccionada?.nombre_ciudad }}</div>
+            <div class="readonly-field">{{ sucursalSeleccionada?.nombre_estado }}</div>
           </div>
           <div class="form-group">
             <label class="form-label">Ciudad</label>
