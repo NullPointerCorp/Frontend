@@ -1,4 +1,9 @@
 import { ref, watch } from 'vue'
+import { createAPI } from '@/api/base.api'
+
+const ubicacionAPI = createAPI('http://localhost:3000/ubicacion')
+const empleadoAPI = createAPI('http://localhost:3000/empleados')
+const sucursalAPI = createAPI('http://localhost:3000/sucursales')
 
 export interface Estado {
   estado_id: number
@@ -39,11 +44,10 @@ export const useUbicacion = () => {
   const fetchEstados = async () => {
     loadingEstados.value = true
     try {
-      const token = localStorage.getItem('token')
-      const res = await fetch('http://localhost:3000/ubicacion/estados', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      estados.value = await res.json()
+      const { data } = await ubicacionAPI.get('/estados')
+      estados.value = Array.isArray(data) ? data : (data?.data ?? [])
+    } catch {
+      estados.value = []
     } finally {
       loadingEstados.value = false
     }
@@ -53,11 +57,10 @@ export const useUbicacion = () => {
     loadingCiudades.value = true
     ciudades.value = []
     try {
-      const token = localStorage.getItem('token')
-      const res = await fetch(`http://localhost:3000/ubicacion/ciudades/${estado_id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      ciudades.value = await res.json()
+      const { data } = await ubicacionAPI.get(`/ciudades/${estado_id}`)
+      ciudades.value = Array.isArray(data) ? data : (data?.data ?? [])
+    } catch {
+      ciudades.value = []
     } finally {
       loadingCiudades.value = false
     }
@@ -67,11 +70,10 @@ export const useUbicacion = () => {
     loadingSucursales.value = true
     sucursalesOpciones.value = []
     try {
-      const token = localStorage.getItem('token')
-      const res = await fetch(`http://localhost:3000/sucursales/por-ciudad?ciudad_id=${ciudad_id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      sucursalesOpciones.value = await res.json()
+      const { data } = await sucursalAPI.get(`/por-ciudad?ciudad_id=${ciudad_id}`)
+      sucursalesOpciones.value = Array.isArray(data) ? data : (data?.data ?? [])
+    } catch {
+      sucursalesOpciones.value = []
     } finally {
       loadingSucursales.value = false
     }
@@ -80,18 +82,15 @@ export const useUbicacion = () => {
   const fetchSupervisores = async () => {
     loadingSupervisores.value = true
     try {
-      const token = localStorage.getItem('token')
-      const res = await fetch('http://localhost:3000/empleados/supervisores', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      const data = await res.json()
-      supervisores.value = data
+      const { data } = await empleadoAPI.get('/supervisores')
+      supervisores.value = Array.isArray(data) ? data : (data?.data ?? [])
+    } catch {
+      supervisores.value = []
     } finally {
       loadingSupervisores.value = false
     }
   }
 
-  // Cuando cambia el estado → limpia ciudad y sucursales
   watch(estadoSeleccionado, (nuevo, anterior) => {
     if (anterior !== null) {
       ciudadSeleccionada.value = null
@@ -101,7 +100,6 @@ export const useUbicacion = () => {
     else ciudades.value = []
   })
 
-  // Cuando cambia la ciudad → carga sucursales
   watch(ciudadSeleccionada, (nuevo, anterior) => {
     if (anterior !== null) sucursalesOpciones.value = []
     if (nuevo) fetchSucursalesPorCiudad(nuevo)

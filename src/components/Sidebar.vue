@@ -1,26 +1,8 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { useMenu } from "@/composables/useMenu";
-import { useAuthStore } from "@/stores/auth.store";
+import { useSidebar } from "@/composables/useSidebar";
 import logo from "@/assets/images/novacodeSP-png.png";
 
-const router = useRouter();
-const auth = useAuthStore();
-
-const { menuItems } = useMenu(auth.session?.id_rol || 0);
-
-const navigateTo = (route: string) => {
-  router.push(route);
-};
-
-const isActive = (path: string) => {
-  return router.currentRoute.value.path.startsWith(path);
-};
-
-const logout = () => {
-  auth.clearSession();
-  router.push("/login");
-};
+const { menuItems, navigateTo, isActive, logout } = useSidebar();
 </script>
 
 <template>

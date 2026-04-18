@@ -1,16 +1,16 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuthStore } from "../stores/auth.store";
+import { useAuthStore } from "../modules/auth/store/auth.store";
 
-import Login from "../views/Login/Login.vue";
+import Login from "../modules/auth/views/Login.vue";
 import MainLayout from "../layouts/MainLayout.vue";
-import Dashboard from "../views/Dashboard/Dashboard.vue";
+import Dashboard from "../modules/dashboard/views/Dashboard.vue";
 
-import Sucursales from "@/views/Sucursales/Sucursales.vue";
-import Clientes from "@/views/Clientes/Clientes.vue";
-import Transportes from "@/views/Transportes/Transportes.vue";
-import Paquetes from "@/views/Paquetes/Paquetes.vue";
-import Almacenes from "@/views/Almacenes/Almacen.vue";
-import empleados from "@/views/Empleados/Empleados.vue";
+import Sucursales from "@/modules/sucursal/views/Sucursales.vue";
+import Clientes from "@/modules/cliente/views/Clientes.vue";
+import Transportes from "@/modules/transporte/views/Transportes.vue"
+import Paquetes from "@/modules/paquete/views/Paquetes.vue";
+import Almacenes from "@/modules/almacen/views/Almacen.vue";
+import empleados from "@/modules/empleado/views/Empleados.vue"
 
 const routes = [
   { path: "/", redirect: "/login" },
