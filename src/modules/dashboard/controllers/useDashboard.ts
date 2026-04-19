@@ -37,7 +37,7 @@ export function useDashboard() {
     },
     {
       icon: "mdi-package-variant-closed",
-      title: "Paquetes",
+      title: "Tipos de paquetes",
       description: "Seguimiento de envíos, estados y logística de última milla.",
       route: "/paquetes",
     },

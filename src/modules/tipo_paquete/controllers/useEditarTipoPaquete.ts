@@ -1,9 +1,9 @@
 import { ref, watch } from "vue";
-import type { Paquete, ActualizarPaqueteDTO } from "@/modules/paquete/interfaces/paquete-interface";
+import type { TipoPaquete, ActualizarTipoPaqueteDTO } from "@/modules/tipo_paquete/interfaces/paquete-interface";
 import { useZodValidation } from "@/composables/useZodValidation";
-import { actualizarPaqueteSchema } from "@/modules/paquete/schemas/PaqueteSchema";
+import { actualizarTipoPaqueteSchema } from "@/modules/tipo_paquete/schemas/TipoPaqueteSchema";
 import { useToast } from "@/composables/useToast";
-import paqueteAPI from "../api/paqueteAPI";
+import tipopaqueteAPI from "../api/tipo_paqueteAPI";
 
 const preciosPorTamano: Record<string, number> = {
   'Pequeño': 5,
@@ -19,13 +19,13 @@ interface FormEditarPaquete {
   peso: number | undefined;
 }
 
-export const useEditarPaquete = (onSuccess: (paquete: Paquete) => void) => {
-  const { validate } = useZodValidation(actualizarPaqueteSchema);
+export const useEditarTipoPaquete = (onSuccess: (paquete: TipoPaquete) => void) => {
+  const { validate } = useZodValidation(actualizarTipoPaqueteSchema);
   const { showToast } = useToast(); 
 
   const dialog = ref(false);
   const loading = ref(false);
-  const paqueteSeleccionado = ref<Paquete | null>(null);
+  const paqueteSeleccionado = ref<TipoPaquete | null>(null);
 
   const form = ref<FormEditarPaquete>({
     tamano: '',
@@ -38,7 +38,7 @@ export const useEditarPaquete = (onSuccess: (paquete: Paquete) => void) => {
     form.value.precio = preciosPorTamano[nuevo] ?? undefined
   })
 
-  const abrirModal = (paquete: Paquete) => {
+  const abrirModal = (paquete: TipoPaquete) => {
     paqueteSeleccionado.value = paquete;
     form.value = {
       tamano: paquete.tamano ?? '',
@@ -49,7 +49,7 @@ export const useEditarPaquete = (onSuccess: (paquete: Paquete) => void) => {
     dialog.value = true;
   };
 
-  const prepararDatos = (): ActualizarPaqueteDTO => ({
+  const prepararDatos = (): ActualizarTipoPaqueteDTO => ({
     tamano: form.value.tamano,
     forma: form.value.forma,
     precio: form.value.precio ?? null,
@@ -57,12 +57,12 @@ export const useEditarPaquete = (onSuccess: (paquete: Paquete) => void) => {
     cliente_id: paqueteSeleccionado.value?.cliente_id ?? null,
   });
 
-  const editarPaquete = async () => { 
+  const editarTipoPaquete = async () => { 
     if (!paqueteSeleccionado.value) return;
 
     loading.value = true;
     try {
-      const { data } = await paqueteAPI.put( 
+      const { data } = await tipopaqueteAPI.put( 
         `/${paqueteSeleccionado.value.folio}`,
         prepararDatos()
       );
@@ -82,7 +82,7 @@ export const useEditarPaquete = (onSuccess: (paquete: Paquete) => void) => {
     form,
     paqueteSeleccionado,
     abrirModal,
-    editarPaquete,
+    editarTipoPaquete,
     validate,
     preciosPorTamano,
   };

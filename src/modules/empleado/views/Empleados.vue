@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { onMounted, watch, ref, computed } from "vue";
 import { useEmpleado } from "@/modules/empleado/controllers/useEmpleado";
-import { useAuthStore } from "@/modules/auth/store/auth.store";
 
 import ModalRegistrarEmpleado from "./components/ModalRegistrarEmpleado.vue";
 import ModalConfirmar from "@/components/ModalConfirmar.vue";
 import ModalEditarEmpleado from "./components/ModalEditarEmpleado.vue";
 
 import Tabla from "@/components/Tabla.vue";
+import AppHeader from "@/components/AppHeader.vue";
 import type { Empleado } from "../interfaces/empleado-interface";
 
-const authStore = useAuthStore();
 const modalEditar = ref<any>(null);
 
 const {
@@ -51,7 +50,7 @@ const empleadosTabla = computed(() =>
     calle: empleado.calle || "-",
     numero_exterior: empleado.numero_exterior || "-",
     numero_interior: empleado.numero_interior || "-",
-    nombre_rol: empleado.nombre_rol || "-",
+    rol_nombre: empleado.rol_nombre || "-",
     nombre_sucursal: empleado.nombre_sucursal || "-",
     _original: empleado,
   })),
@@ -63,17 +62,10 @@ watch(search, () => { page.value = 1; });
 
 <template>
   <v-app>
-    <v-main class="main-content" theme="light">
+    <v-main class="main-content">
 
-      <div class="header">
-        <div></div>
-        <div class="user-info">
-          <div class="user-details">
-            <span class="user-name">{{ authStore.session?.nombre }}</span>
-            <span class="user-role">{{ authStore.session?.rol }}</span>
-          </div>
-        </div>
-      </div>
+      <!-- Header -->
+      <AppHeader/>
 
       <div class="content-wrapper">
 
@@ -112,7 +104,7 @@ watch(search, () => { page.value = 1; });
           { title: 'Calle', key: 'calle' },
           { title: 'Numero Exterior', key: 'numero_exterior' },
           { title: 'Numero Interior', key: 'numero_interior' },
-          { title: 'Rol', key: 'nombre_rol' },
+          { title: 'Rol', key: 'rol_nombre' },
           { title: 'Nombre de la Sucursal', key: 'nombre_sucursal' },
           { title: 'Acciones', key: 'acciones', sortable: false }
         ]" :items="empleadosTabla" :loading="loading" :page="page" :limit="limit" :total-items="totalEmpleados"

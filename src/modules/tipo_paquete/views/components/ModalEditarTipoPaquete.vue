@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useEditarPaquete } from '@/modules/paquete/controllers/useEditarPaquete'
+import { useEditarTipoPaquete } from '@/modules/tipo_paquete/controllers/useEditarTipoPaquete'
 import { useToast } from '@/composables/useToast'
-import type { Paquete } from '@/modules/paquete/interfaces/paquete-interface'
+import type { TipoPaquete } from '@/modules/tipo_paquete/interfaces/paquete-interface'
 
-const emit = defineEmits<{ (e: 'paqueteEditado', paquete: Paquete): void }>()
+const emit = defineEmits<{ (e: 'paqueteEditado', tipo_paquete: TipoPaquete): void }>()
 
 const { showToast } = useToast()
-const { dialog, loading, form, paqueteSeleccionado, abrirModal, editarPaquete, validate, preciosPorTamano } =
-  useEditarPaquete((paquete) => emit('paqueteEditado', paquete)) 
+const { dialog, loading, form, paqueteSeleccionado, abrirModal, editarTipoPaquete, validate, preciosPorTamano } =
+  useEditarTipoPaquete((tipo_paquete) => emit('paqueteEditado', tipo_paquete)) 
 
 const formRef = ref()
 
@@ -35,7 +35,7 @@ const guardar = async () => {
     showToast('Por favor corrige los errores del formulario', 'warning')
     return
   }
-  await editarPaquete()
+  await editarTipoPaquete()
 }
 
 const handleKeydown = (e: KeyboardEvent) => {
@@ -52,7 +52,7 @@ defineExpose({ abrirModal })
 
 <template>
   <v-dialog v-model="dialog" max-width="600" persistent>
-    <v-card class="modal-card" theme="light">
+    <v-card class="modal-card">
 
       <div class="modal-header">
         <button class="back-link" type="button" @click="dialog = false">
@@ -63,17 +63,12 @@ defineExpose({ abrirModal })
         <p class="modal-subtitle">Actualice la información del paquete.</p>
       </div>
 
-      <!-- ✅ @submit llama guardar, sin pasar formRef -->
       <v-form ref="formRef" @submit.prevent="guardar" validate-on="blur" class="modal-form">
 
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Folio</label>
             <div class="readonly-field">{{ paqueteSeleccionado?.folio }}</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Cliente</label>
-            <div class="readonly-field">{{ paqueteSeleccionado?.nombre_cliente }}</div>
           </div>
         </div>
 
@@ -91,11 +86,6 @@ defineExpose({ abrirModal })
         </div>
 
         <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Peso (kg) <span class="required">*</span></label>
-            <v-text-field v-model.number="form.peso" type="number" variant="outlined" density="comfortable"
-              hide-details="auto" suffix="KG" :rules="[validate('peso')]" />
-          </div>
           <div class="form-group">
             <label class="form-label">Precio del paquete</label>
             <div class="precio-label" :class="{ 'precio-activo': precioCalculado !== null }">

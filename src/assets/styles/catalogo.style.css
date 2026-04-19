@@ -1,14 +1,19 @@
-/* Variables */
+/* Variables — mapeadas al tema de Vuetify */
 :root {
-  --primary-color: #1565c0;
-  --primary-light: #e3f2fd;
-  --background-color: #f5f7fa;
-  --card-background: #ffffff;
-  --text-primary: #212121;
-  --text-secondary: #757575;
-  --border-color: #e0e0e0;
+  --primary-color: rgb(var(--v-theme-primary));
+  --primary-light: rgba(var(--v-theme-primary), 0.12);
+  --background-color: rgb(var(--v-theme-background));
+  --card-background: rgb(var(--v-theme-surface));
+  --text-primary: rgb(var(--v-theme-on-surface));
+  --text-secondary: rgba(var(--v-theme-on-surface), 0.7);
+  --border-color: rgba(var(--v-border-color), var(--v-border-opacity));
   --sidebar-width: 220px;
-  --danger-color: #ef5350;
+  --danger-color: rgb(var(--v-theme-error));
+}
+
+/* Red de seguridad: texto heredado usa el color del tema */
+.v-application {
+  color: rgb(var(--v-theme-on-background));
 }
 
 /* Sidebar */
@@ -52,11 +57,11 @@
 
 .menu-item-active {
   background-color: var(--primary-color) !important;
-  color: white !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
 }
 
 .menu-item-active .v-icon {
-  color: white !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
 }
 
 .sidebar-footer {
@@ -68,7 +73,7 @@
 }
 
 .logout-btn:hover {
-  background-color: #ffebee !important;
+  background-color: rgba(var(--v-theme-error), 0.1) !important;
 }
 
 /* Main Content */
@@ -185,7 +190,7 @@
 }
 
 .table-card th {
-  background-color: #fafafa !important;
+  background-color: rgba(var(--v-theme-on-surface), 0.04) !important;
   font-weight: 600 !important;
   color: var(--text-secondary) !important;
   font-size: 0.8rem !important;

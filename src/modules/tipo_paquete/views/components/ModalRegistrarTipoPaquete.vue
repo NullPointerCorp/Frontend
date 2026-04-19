@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
-import { useRegistrarPaquete } from '@/modules/paquete/controllers/useRegistrarPaquete'
+import { useRegistrarTipoPaquete } from '@/modules/tipo_paquete/controllers/useRegistrarTipoPaquete'
 import { useToast } from '@/composables/useToast'
-import type { Paquete } from '@/modules/paquete/interfaces/paquete-interface'
+import type { TipoPaquete } from '@/modules/tipo_paquete/interfaces/paquete-interface'
 import clienteAPI from '@/modules/cliente/api/clienteAPI'
 
 const { showToast } = useToast()
-const { form, resetForm, registrarPaquete, validate, preciosPorTamano } = useRegistrarPaquete()
+const { form, resetForm, registrarTipoPaquete, validate, preciosPorTamano } = useRegistrarTipoPaquete()
 
-const emit = defineEmits<{ paqueteCreado: [paquete: Paquete] }>()
+const emit = defineEmits<{ paqueteCreado: [paquete: TipoPaquete] }>()
 
 const dialog = ref(false)
 const loading = ref(false)
@@ -32,37 +32,12 @@ const formaOpciones = [
   { title: 'Circular', value: 'Circular' },
 ]
 
-const precioCalculado = computed(() => {
-  if (!form.tamano) return null
-  return preciosPorTamano[form.tamano] ?? null
-})
-
 watch(dialog, async (abierto) => {
   if (abierto) {
     await nextTick()
     correoRef.value?.focus()
   }
 })
-
-const buscarCliente = async () => {
-  if (!correo.value.trim()) {
-    nombreCliente.value = ''
-    form.cliente_id = null
-    return
-  }
-  loadingCliente.value = true
-  try {
-    const { data } = await clienteAPI.get(`/buscar?correo=${encodeURIComponent(correo.value)}`)
-    nombreCliente.value = `${data.nombre} ${data.apellido_paterno}`
-    form.cliente_id = data.cliente_id
-  } catch {
-    nombreCliente.value = ''
-    form.cliente_id = null
-    showToast('Cliente no encontrado', 'error')
-  } finally {
-    loadingCliente.value = false
-  }
-}
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return
@@ -88,13 +63,9 @@ const guardar = async () => {
     showToast('Por favor corrige los errores del formulario', 'warning')
     return
   }
-  if (!form.cliente_id) {
-    showToast('Debes buscar y seleccionar un cliente válido', 'warning')
-    return
-  }
   loading.value = true
   try {
-    const nuevoPaquete = await registrarPaquete()
+    const nuevoPaquete = await registrarTipoPaquete()
     emit('paqueteCreado', nuevoPaquete)
     cancelar()
   } catch {
@@ -108,64 +79,30 @@ const guardar = async () => {
 <template>
   <v-btn color="primary" class="register-btn" @click="dialog = true">
     <v-icon start>mdi-plus</v-icon>
-    Registrar Nuevo Paquete
+    Registrar Nuevo Tipo de paquete
   </v-btn>
 
   <v-dialog v-model="dialog" max-width="600" persistent>
-    <v-card class="modal-card" theme="light">
+    <v-card class="modal-card">
 
       <div class="modal-header">
         <button class="back-link" type="button" @click="cancelar">
           <v-icon size="18">mdi-chevron-left</v-icon>
           Volver al Catálogo
         </button>
-        <h1 class="modal-title">Registrar Paquete</h1>
-        <p class="modal-subtitle">Complete los datos necesarios para dar de alta un nuevo paquete en el sistema.</p>
+        <h1 class="modal-title">Registrar Tipo de paquete</h1>
+        <p class="modal-subtitle">Complete los datos necesarios para dar de alta un nuevo tipo de paquete en el sistema.</p>
       </div>
 
       <v-form ref="formRef" @submit.prevent="guardar" class="modal-form">
-
-        <!-- Correo del cliente -->
-        <div class="form-group full-width">
-          <label class="form-label">
-            Correo del Cliente <span class="required">*</span>
-          </label>
-          <v-text-field
-            ref="correoRef"
-            v-model="correo"
-            placeholder="cliente@ejemplo.com"
-            variant="outlined"
-            density="comfortable"
-            hide-details="auto"
-            :loading="loadingCliente"
-            @keyup.enter="buscarCliente"
-          >
-            <template #append>
-              <v-btn icon variant="text" :loading="loadingCliente" @click="buscarCliente">
-                <v-icon>mdi-magnify</v-icon>
-              </v-btn>
-            </template>
-          </v-text-field>
-          <div class="cliente-info" v-if="nombreCliente">
-            <v-icon size="14" color="success">mdi-check-circle</v-icon>
-            <span>{{ nombreCliente }}</span>
-          </div>
-          <div class="cliente-info text-grey" v-else>
-            <v-icon size="14">mdi-account-outline</v-icon>
-            <span>Nombre del cliente</span>
-          </div>
-        </div>
-
         <!-- Tamaño y Forma -->
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Tamaño de caja <span class="required">*</span></label>
-            <v-select
+            <v-text-field
+              ref="tamanoRef"
               v-model="form.tamano"
-              :items="tamanioOpciones"
-              item-title="title"
-              item-value="value"
-              placeholder="Seleccionar tamaño"
+              placeholder="Ej: Grande"
               variant="outlined"
               density="comfortable"
               hide-details="auto"
@@ -174,12 +111,10 @@ const guardar = async () => {
           </div>
           <div class="form-group">
             <label class="form-label">Forma del paquete <span class="required">*</span></label>
-            <v-select
+            <v-text-field
+              ref="formaRef"
               v-model="form.forma"
-              :items="formaOpciones"
-              item-title="title"
-              item-value="value"
-              placeholder="Seleccionar forma"
+              placeholder="Ej: Cuadrada"
               variant="outlined"
               density="comfortable"
               hide-details="auto"
@@ -191,25 +126,20 @@ const guardar = async () => {
         <!-- Peso y Precio -->
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Peso <span class="required">*</span></label>
+            <label class="form-label">
+              <v-icon size="14" class="label-icon">mdi-currency-usd</v-icon>
+              Precio <span class="required">*</span>
+            </label>
             <v-text-field
-              v-model.number="form.peso"
+              ref="precioRef"
+              v-model.number="form.precio"
               type="number"
-              placeholder="0"
+              placeholder="Ej: 99.99"
               variant="outlined"
               density="comfortable"
               hide-details="auto"
-              suffix="KG"
-              :rules="[validate('peso')]"
+              :rules="[validate('precio')]"
             />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Precio del paquete</label>
-            <div class="precio-label" :class="{ 'precio-activo': precioCalculado !== null }">
-              <v-icon size="16">mdi-currency-usd</v-icon>
-              <span v-if="precioCalculado !== null">{{ precioCalculado }}.00 MXN</span>
-              <span v-else class="text-grey">0.00 MXN</span>
-            </div>
           </div>
         </div>
 

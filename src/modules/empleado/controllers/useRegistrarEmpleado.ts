@@ -1,6 +1,6 @@
 import { reactive } from "vue";
 import type { Empleado, CrearEmpleadoDTO } from "@/modules/empleado/interfaces/empleado-interface";
-import type { RolOpcion } from "@/modules/rol/interfaces/rol-interface";
+import type { Rol } from "@/modules/rol/interfaces/rol-interface";
 import { useZodValidation } from "@/composables/useZodValidation";
 import { empleadoSchema } from "@/modules/empleado/schemas/EmpleadoSchema";
 import { useToast } from "@/composables/useToast";
@@ -27,117 +27,66 @@ interface FormRegistrarEmpleado {
   sucursal_id: number | null;
 }
 
+const formInicial = (): FormRegistrarEmpleado => ({
+  nombre: "",
+  apellido_paterno: "",
+  apellido_materno: "",
+  telefono: "",
+  correo: "",
+  password: "",
+  confirm_password: "",
+  ciudad_id: null,
+  colonia: "",
+  codigo_postal: "",
+  calle: "",
+  numero_exterior: "",
+  numero_interior: "",
+  rol_id: null,
+  sucursal_id: null,
+});
+
 export const useRegistrarEmpleado = () => {
   const { validate } = useZodValidation(empleadoSchema);
   const { showToast } = useToast();
 
-  const form = reactive<FormRegistrarEmpleado>({
-    nombre: "",
-    apellido_paterno: "",
-    apellido_materno: "",
-    telefono: "",
-    correo: "",
-    password: "",
-    confirm_password: "",
-    ciudad_id: null,
-    colonia: "",
-    codigo_postal: "",
-    calle: "",
-    numero_exterior: "",
-    numero_interior: "",
-    rol_id: null,
-    sucursal_id: null,
-  });
+  const form = reactive<FormRegistrarEmpleado>(formInicial());
 
-  const resetForm = () => {
-    form.nombre = "";
-    form.apellido_paterno = "";
-    form.apellido_materno = "";
-    form.telefono = "";
-    form.correo = "";
-    form.password = "";
-    form.confirm_password = "";
-    form.ciudad_id = null;
-    form.colonia = "";
-    form.codigo_postal = "";
-    form.calle = "";
-    form.numero_exterior = "";
-    form.numero_interior = "";
-    form.rol_id = null;
-    form.sucursal_id = null;
-  };
+  const resetForm = () => Object.assign(form, formInicial());
 
-  const normalizarRoles = (data: unknown): RolOpcion[] => {
-    if (!Array.isArray(data)) return [];
-    return data
-      .map((item: any) => ({
-        rol_id: Number(item?.rol_id ?? item?.id_rol ?? item?.id ?? 0),
-        nombre_rol: String(item?.nombre_rol ?? item?.rol_nombre ?? item?.rol ?? item?.nombre ?? item?.descripcion ?? ""),
-      }))
-      .filter((rol) => rol.rol_id > 0 && rol.nombre_rol);
-  };
-
-  const normalizarSucursales = (data: unknown): SucursalOpcion[] => {
-    if (!Array.isArray(data)) return [];
-    return data
-      .map((item: any) => ({
-        sucursal_id: Number(item?.sucursal_id ?? item?.id_sucursal ?? item?.id ?? 0),
-        nombre_sucursal: String(item?.nombre_sucursal ?? item?.sucursal_nombre ?? item?.sucursal ?? item?.nombre ?? item?.descripcion ?? ""),
-      }))
-      .filter((sucursal) => sucursal.sucursal_id > 0 && sucursal.nombre_sucursal);
-  };
-
-  const obtenerPayload = (data: any) => {
-    const candidato = data?.data ?? data?.rows ?? data?.result ?? data;
-    if (Array.isArray(candidato)) return candidato;
-    if (Array.isArray(candidato?.roles)) return candidato.roles;
-    if (Array.isArray(candidato?.sucursales)) return candidato.sucursales;
-    if (Array.isArray(candidato?.items)) return candidato.items;
-    return candidato;
-  };
-
-  const fetchRoles = async (): Promise<RolOpcion[]> => {
-    try {
-      const { data } = await rolAPI.get('/') 
-      return normalizarRoles(obtenerPayload(data));
-    } catch {
-      return [];
-    }
+  const fetchRoles = async (): Promise<Rol[]> => {
+    const { data } = await rolAPI.get<Rol[]>("/");
+    return Array.isArray(data) ? data : [];
   };
 
   const fetchSucursales = async (): Promise<SucursalOpcion[]> => {
-    try {
-      const { data } = await sucursalAPI.get('/') 
-      return normalizarSucursales(obtenerPayload(data));
-    } catch {
-      return [];
-    }
+    const { data } = await sucursalAPI.get<SucursalOpcion[]>("/");
+    return Array.isArray(data) ? data : [];
   };
 
   const prepararDatos = (): CrearEmpleadoDTO => ({
     nombre: form.nombre.trim(),
     apellido_paterno: form.apellido_paterno.trim(),
-    apellido_materno: form.apellido_materno?.trim() || null,
-    telefono: form.telefono?.trim() || null,
+    apellido_materno: form.apellido_materno.trim() || null,
+    telefono: form.telefono.trim() || null,
     correo: form.correo.trim().toLowerCase(),
     contrasena: form.password,
-    rol_id: form.rol_id != null ? Number(form.rol_id) : null,
-    sucursal_id: form.sucursal_id != null ? Number(form.sucursal_id) : null,
-    ciudad_id: form.ciudad_id != null ? Number(form.ciudad_id) : null,
-    colonia: form.colonia?.trim() || null,
-    codigo_postal: form.codigo_postal?.trim() || null,
-    calle: form.calle?.trim() || null,
-    numero_exterior: form.numero_exterior?.trim() || null,
-    numero_interior: form.numero_interior?.trim() || null,
+    rol_id: form.rol_id,
+    sucursal_id: form.sucursal_id,
+    ciudad_id: form.ciudad_id,
+    colonia: form.colonia.trim() || null,
+    codigo_postal: form.codigo_postal.trim() || null,
+    calle: form.calle.trim() || null,
+    numero_exterior: form.numero_exterior.trim() || null,
+    numero_interior: form.numero_interior.trim() || null,
   });
 
   const registrarEmpleado = async (): Promise<Empleado> => {
     try {
-      const { data } = await empleadoAPI.post<Empleado>('/', prepararDatos()) 
-      showToast('¡Empleado registrado con éxito!', 'success')
+      const { data } = await empleadoAPI.post<Empleado>("/", prepararDatos());
+      showToast("¡Empleado registrado con éxito!", "success");
       return data;
     } catch (error: any) {
-      showToast(error.message || 'Error al registrar empleado', 'error')
+      showToast(error.message || "Error al registrar empleado", "error");
       throw error;
     }
   };

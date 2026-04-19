@@ -1,9 +1,9 @@
 import { reactive, watch } from 'vue'
 import { useZodValidation } from '@/composables/useZodValidation'
-import { paqueteSchema } from '@/modules/paquete/schemas/PaqueteSchema'
-import type { Paquete, CrearPaqueteDTO } from '@/modules/paquete/interfaces/paquete-interface'
+import { tipoPaqueteSchema } from '@/modules/tipo_paquete/schemas/TipoPaqueteSchema'
+import type { TipoPaquete, CrearTipoPaqueteDTO } from '../interfaces/paquete-interface'
 import { useToast } from '@/composables/useToast'
-import paqueteAPI from '../api/paqueteAPI'
+import paqueteAPI from '../api/tipo_paqueteAPI'
 
 const preciosPorTamano: Record<string, number> = {
   'Pequeño': 5,
@@ -20,8 +20,8 @@ interface FormRegistrarPaquete {
   peso: number | undefined;
 }
 
-export const useRegistrarPaquete = () => {
-  const { validate } = useZodValidation(paqueteSchema)
+export const useRegistrarTipoPaquete = () => {
+  const { validate } = useZodValidation(tipoPaqueteSchema)
   const { showToast } = useToast()
 
   const form = reactive<FormRegistrarPaquete>({
@@ -32,10 +32,6 @@ export const useRegistrarPaquete = () => {
     peso: undefined,
   })
 
-  watch(() => form.tamano, (nuevo) => {
-    form.precio = preciosPorTamano[nuevo] ?? undefined
-  })
-
   const resetForm = () => {
     form.cliente_id = null
     form.tamano = ''
@@ -44,7 +40,7 @@ export const useRegistrarPaquete = () => {
     form.peso = undefined
   }
 
-  const prepararDatos = (): CrearPaqueteDTO => ({
+  const prepararDatos = (): CrearTipoPaqueteDTO => ({
     cliente_id: form.cliente_id!,
     tamano: form.tamano,
     forma: form.forma,
@@ -52,9 +48,9 @@ export const useRegistrarPaquete = () => {
     peso: form.peso ?? null,
   })
 
-  const registrarPaquete = async (): Promise<Paquete> => {
+  const registrarTipoPaquete = async (): Promise<TipoPaquete> => {
     try {
-      const { data } = await paqueteAPI.post<Paquete>('/nuevo', prepararDatos()) 
+      const { data } = await paqueteAPI.post<TipoPaquete>('/nuevo', prepararDatos()) 
       showToast('¡Paquete registrado con éxito!', 'success')
       return data
     } catch (error: any) {
@@ -63,5 +59,5 @@ export const useRegistrarPaquete = () => {
     }
   }
 
-  return { form, resetForm, registrarPaquete, validate, preciosPorTamano }
+  return { form, resetForm, registrarTipoPaquete, validate, preciosPorTamano }
 }

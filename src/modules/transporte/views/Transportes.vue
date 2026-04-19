@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from 'vue'
 import { useTransporte } from '@/modules/transporte/controllers/useTransporte'
-import { useAuthStore } from '@/modules/auth/store/auth.store'
 
 import ModalRegistrarTransporte from './components/ModalRegistrarTransporte.vue'
 import ModalEditarTransporte from './components/ModalEditarTransporte.vue'
 import ModalConfirmar from '@/components/ModalConfirmar.vue'
-import Tabla from '@/components/Tabla.vue'
 
-const authStore = useAuthStore()
+import Tabla from '@/components/Tabla.vue'
+import AppHeader from '@/components/AppHeader.vue'
+
 const modalEditar = ref<any>(null)
 
 const {
@@ -35,18 +35,10 @@ watch(search, () => { page.value = 1 })
 
 <template>
   <v-app>
-    <v-main class="main-content" theme="light">
+    <v-main class="main-content">
 
       <!-- Header -->
-      <div class="header">
-        <div></div>
-        <div class="user-info">
-          <div class="user-details">
-            <span class="user-name">{{ authStore.session?.nombre }}</span>
-            <span class="user-role">{{ authStore.session?.rol }}</span>
-          </div>
-        </div>
-      </div>
+      <AppHeader/>
 
       <div class="content-wrapper">
 

@@ -1,13 +1,13 @@
-/* Variables */
+/* Variables — mapeadas al tema de Vuetify */
 :root {
-  --primary-color: #1565c0;
-  --success-color: #2e7d32;
-  --warning-color: #f9a825;
-  --text-primary: #212121;
-  --text-secondary: #757575;
-  --border-color: #e0e0e0;
-  --background-light: #fafafa;
-  --background-red: #cc3201;
+  --primary-color: rgb(var(--v-theme-primary));
+  --success-color: rgb(var(--v-theme-success));
+  --warning-color: rgb(var(--v-theme-warning));
+  --text-primary: rgb(var(--v-theme-on-surface));
+  --text-secondary: rgba(var(--v-theme-on-surface), 0.7);
+  --border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+  --background-light: rgba(var(--v-theme-on-surface), 0.04);
+  --background-red: rgb(var(--v-theme-error));
 }
 
 /* Botón de registro */
@@ -22,15 +22,17 @@
 .modal-card {
   border-radius: 12px !important;
   overflow: hidden;
-  max-height: 90vh;       
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
+  background-color: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-on-surface));
 }
 
 .modal-form {
   padding: 24px 32px;
-  overflow-y: auto;        
-  flex: 1;                 
+  overflow-y: auto;
+  flex: 1;
 }
 
 /* Header */
@@ -102,7 +104,17 @@
 }
 
 .required {
-  color: #d32f2f;
+  color: rgb(var(--v-theme-error));
+}
+
+/* Campo readonly (readonly-field) */
+.readonly-field {
+  padding: 10px 14px;
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
+  color: rgb(var(--v-theme-on-surface));
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
 }
 
 /* Input styling con :deep() para penetrar Vuetify */
@@ -133,12 +145,12 @@
   font-weight: 500;
   border-radius: 8px;
   border-color: var(--border-color) !important;
-  color: white !important;
+  color: rgb(var(--v-theme-on-error)) !important;
   background-color: var(--background-red) !important;
 }
 
 .cancel-btn:hover {
-  background-color: var(--background-light) !important;
+  background-color: rgba(var(--v-theme-error), 0.85) !important;
 }
 
 .save-btn {
@@ -146,11 +158,11 @@
   font-weight: 500;
   border-radius: 8px;
   background-color: var(--success-color) !important;
-  color: white !important;
+  color: rgb(var(--v-theme-on-success)) !important;
 }
 
 .save-btn:hover {
-  background-color: #1b5e20 !important;
+  background-color: rgba(var(--v-theme-success), 0.85) !important;
 }
 
 /* Footer */

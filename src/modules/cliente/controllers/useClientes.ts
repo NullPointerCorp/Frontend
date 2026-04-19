@@ -33,7 +33,7 @@ export const useClientes = () => {
         c.telefono.includes(q),
     );
   });
-
+  
   const totalClientes = computed(() => clientesFiltrados.value.length);
 
   const totalPaginas = computed(() =>

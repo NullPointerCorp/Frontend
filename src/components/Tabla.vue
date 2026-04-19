@@ -7,7 +7,7 @@ const props = defineProps<{
   limit: number
   totalItems: number
   totalPaginas: number
-  itemKey?: string  
+  itemKey?: string
 }>()
 
 const emit = defineEmits<{
@@ -22,8 +22,7 @@ const getItemId = (item: any): number => {
 </script>
 
 <template>
-  <v-card class="table-card" theme="light">
-
+  <v-card class="table-card">
     <div class="table-scroll">
       <v-data-table
         :headers="headers"
@@ -34,7 +33,7 @@ const getItemId = (item: any): number => {
       >
         <template #no-data>
           <div class="no-data">
-            <v-icon size="48" color="grey-lighten-1">mdi-database-off-outline</v-icon>
+            <v-icon size="48" color="on-surface">mdi-database-off-outline</v-icon>
             <p>No hay registros disponibles</p>
           </div>
         </template>
@@ -66,7 +65,6 @@ const getItemId = (item: any): number => {
         @update:model-value="emit('update:page', $event)"
       />
     </div>
-
   </v-card>
 </template>
 
@@ -80,7 +78,7 @@ const getItemId = (item: any): number => {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: #fff;
+  background: rgb(var(--v-theme-surface));
 }
 
 .no-data {
@@ -89,7 +87,7 @@ const getItemId = (item: any): number => {
   align-items: center;
   gap: 8px;
   padding: 48px;
-  color: #9ca3af;
+  color: rgba(var(--v-theme-on-surface), 0.6);
   font-size: 0.9rem;
 }
 </style>

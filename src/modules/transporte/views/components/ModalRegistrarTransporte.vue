@@ -79,7 +79,7 @@ const guardar = async () => {
   </v-btn>
 
   <v-dialog v-model="dialog" max-width="700" persistent>
-    <v-card class="modal-card" theme="light">
+    <v-card class="modal-card">
 
       <div class="modal-header">
         <button class="back-link" type="button" @click="cancelar">

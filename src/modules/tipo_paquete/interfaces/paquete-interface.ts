@@ -1,5 +1,5 @@
 // paquete-interface.ts
-export interface Paquete {
+export interface TipoPaquete {
   folio: number;
   cliente_id: number;
   nombre_cliente?: string;
@@ -9,7 +9,7 @@ export interface Paquete {
   peso: number;
 }
 
-export interface CrearPaqueteDTO {
+export interface CrearTipoPaqueteDTO {
   cliente_id: number;
   tamano: string;
   forma: string;
@@ -17,7 +17,7 @@ export interface CrearPaqueteDTO {
   peso: number | null;
 }
 
-export interface ActualizarPaqueteDTO {
+export interface ActualizarTipoPaqueteDTO {
   tamano: string;
   forma: string;
   precio: number | null;

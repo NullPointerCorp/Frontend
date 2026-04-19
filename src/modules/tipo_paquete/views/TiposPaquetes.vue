@@ -1,60 +1,53 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from "vue";
-import { usePaquetes } from "@/modules/paquete/controllers/usePaquetes";
+import { useTipoPaquete } from "../controllers/useTipoPaquetes";
 import { useAuthStore } from "@/modules/auth/store/auth.store";
 
-import ModalRegistrarPaquete from "./components/ModalRegistrarPaquete.vue";
-import ModalEditarPaquete from "./components/ModalEditarPaquete.vue";
+import ModalRegistrarPaquete from "./components/ModalRegistrarTipoPaquete.vue";
+import ModalEditarPaquete from "./components/ModalEditarTipoPaquete.vue";
 import ModalConfirmar from "@/components/ModalConfirmar.vue";
 import Tabla from "@/components/Tabla.vue";
+import AppHeader from "@/components/AppHeader.vue";
 
 const authStore = useAuthStore();
 const modalEditar = ref<any>(null);
 
 const {
-  paquetesPaginados,
+  tiposPaquetesPaginados,
   totalPaginas,
-  totalPaquetes,
+  totalTiposPaquetes,
   page,
   limit,
   search,
   loading,
-  fetchPaquetes,
-  agregarPaquete,
-  actualizarPaquete,
-  eliminarPaquete,
+  fetchTiposPaquetes,
+  agregarTipoPaquete,
+  actualizarTipoPaquete,
+  eliminarTipoPaquete,
   dialogConfirmar,
   mensajeConfirmar,
   aceptar,
   cancelar,
-} = usePaquetes();
+} = useTipoPaquete();
 
-onMounted(fetchPaquetes);
+onMounted(fetchTiposPaquetes);
 watch(search, () => { page.value = 1; });
 </script>
 
 <template>
   <v-app>
-    <v-main class="main-content" theme="light">
+    <v-main class="main-content">
 
-      <div class="header">
-        <div></div>
-        <div class="user-info">
-          <div class="user-details">
-            <span class="user-name">{{ authStore.session?.nombre }}</span>
-            <span class="user-role">{{ authStore.session?.rol }}</span>
-          </div>
-        </div>
-      </div>
+      <AppHeader />
 
       <div class="content-wrapper">
 
         <div class="page-header">
           <div>
-            <h1 class="page-title">Catálogo de Paquetes</h1>
-            <p class="page-subtitle">Gestione la base de datos de paquetes.</p>
+            <h1 class="page-title">Catálogo de Tipos de Paquetes</h1>
+            <p class="page-subtitle">Gestione la base de datos de tipos de paquetes.</p>
           </div>
-          <ModalRegistrarPaquete @paqueteCreado="agregarPaquete" />
+          <ModalRegistrarPaquete @paqueteCreado="agregarTipoPaquete" />
         </div>
 
         <div class="filters-row">
@@ -74,21 +67,19 @@ watch(search, () => { page.value = 1; });
           item-key="folio"
           :headers="[
             { title: 'Folio', key: 'folio' },
-            { title: 'Cliente', key: 'nombre_cliente' },
             { title: 'Tamaño', key: 'tamano' },
             { title: 'Forma', key: 'forma' },
-            { title: 'Peso (kg)', key: 'peso' },
             { title: 'Precio', key: 'precio' },
             { title: 'Acciones', key: 'acciones', sortable: false }
           ]"
-          :items="paquetesPaginados"
+          :items="tiposPaquetesPaginados"
           :loading="loading"
           :page="page"
           :limit="limit"
-          :total-items="totalPaquetes"
+          :total-items="totalTiposPaquetes"
           :total-paginas="totalPaginas"
           @editar="modalEditar?.abrirModal($event)"
-          @eliminar="eliminarPaquete"
+          @eliminar="eliminarTipoPaquete"
           @update:page="page = $event"
         />
 
@@ -99,7 +90,7 @@ watch(search, () => { page.value = 1; });
       </div>
 
       <ModalConfirmar :dialog="dialogConfirmar" :mensaje="mensajeConfirmar" @aceptar="aceptar" @cancelar="cancelar" />
-      <ModalEditarPaquete ref="modalEditar" @paqueteEditado="actualizarPaquete" />
+      <ModalEditarPaquete ref="modalEditar" @paqueteEditado="actualizarTipoPaquete" />
 
     </v-main>
   </v-app>

@@ -3,14 +3,15 @@ import { useAuthStore } from "../modules/auth/store/auth.store";
 
 import Login from "../modules/auth/views/Login.vue";
 import MainLayout from "../layouts/MainLayout.vue";
-import Dashboard from "../modules/dashboard/views/Dashboard.vue";
 
+import Dashboard from "../modules/dashboard/views/Dashboard.vue";
 import Sucursales from "@/modules/sucursal/views/Sucursales.vue";
 import Clientes from "@/modules/cliente/views/Clientes.vue";
 import Transportes from "@/modules/transporte/views/Transportes.vue"
-import Paquetes from "@/modules/paquete/views/Paquetes.vue";
+import TiposPaquetes from "@/modules/tipo_paquete/views/TiposPaquetes.vue";
 import Almacenes from "@/modules/almacen/views/Almacen.vue";
 import empleados from "@/modules/empleado/views/Empleados.vue"
+import Roles from "@/modules/rol/views/Roles.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -25,12 +26,13 @@ const routes = [
     component: MainLayout,
     children: [
       { path: "dashboard", component: Dashboard },
-      { path: "clientes", component: Clientes },
       { path: "sucursales", component: Sucursales },
       { path: "almacenes", component: Almacenes },
-      { path: "paquetes", component: Paquetes },
+      { path: "roles", component: Roles },
+      {path: "empleados", component: empleados},
       { path: "transporte", component: Transportes },
-      {path: "empleados", component: empleados}
+      { path: "clientes", component: Clientes },
+      { path: "tipos-paquete", component: TiposPaquetes },
     ]
   }
 ];

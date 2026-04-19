@@ -5,7 +5,7 @@ export interface Session {
   id: number;
   nombre: string;
   rol: string;
-  id_rol: number;
+  rol_id: number;
 }
 
 export const useAuthStore = defineStore("auth", () => {

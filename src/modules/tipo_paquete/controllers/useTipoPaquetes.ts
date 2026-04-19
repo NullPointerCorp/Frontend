@@ -1,16 +1,16 @@
 import { ref, computed } from "vue";
-import type { Paquete } from "@/modules/paquete/interfaces/paquete-interface";
+import type { TipoPaquete } from "@/modules/tipo_paquete/interfaces/paquete-interface";
 import { useConfirmar } from "@/composables/useConfirmar";
 import { useToast } from "@/composables/useToast";
-import paqueteAPI from "../api/paqueteAPI";
+import tipoPaqueteAPI from "@/modules/tipo_paquete/api/tipo_paqueteAPI";
 
-const todosLosPaquetes = ref<Paquete[]>([]);
+const todosLosPaquetes = ref<TipoPaquete[]>([]);
 const search = ref("");
 const page = ref(1);
 const limit = ref(10);
 const loading = ref(false);
 
-export const usePaquetes = () => {
+export const useTipoPaquete = () => {
   const { showToast } = useToast(); 
 
   const {
@@ -34,21 +34,21 @@ export const usePaquetes = () => {
     );
   });
 
-  const totalPaquetes = computed(() => paquetesFiltrados.value.length);
+  const totalTiposPaquetes = computed(() => paquetesFiltrados.value.length);
 
   const totalPaginas = computed(() =>
     Math.ceil(paquetesFiltrados.value.length / limit.value),
   );
 
-  const paquetesPaginados = computed(() => {
+  const tiposPaquetesPaginados = computed(() => {
     const start = (page.value - 1) * limit.value;
     return paquetesFiltrados.value.slice(start, start + limit.value);
   });
 
-  const fetchPaquetes = async () => {
+  const fetchTiposPaquetes = async () => {
     loading.value = true;
     try {
-      const { data } = await paqueteAPI.get<Paquete[]>('/') 
+      const { data } = await tipoPaqueteAPI.get<TipoPaquete[]>('/') 
       todosLosPaquetes.value = Array.isArray(data) ? data : [];
     } catch {
       // interceptor maneja el error
@@ -57,24 +57,24 @@ export const usePaquetes = () => {
     }
   };
 
-  const agregarPaquete = (paquete: Paquete) => {
+  const agregarTipoPaquete = (paquete: TipoPaquete) => {
     todosLosPaquetes.value = [...todosLosPaquetes.value, paquete];
   };
 
-  const actualizarPaquete = (paquete: Paquete) => {
+  const actualizarTipoPaquete = (paquete: TipoPaquete) => {
     todosLosPaquetes.value = todosLosPaquetes.value.map((p) =>
       p.folio === paquete.folio ? paquete : p,
     );
   };
 
-  const eliminarPaquete = async (item: Paquete) => {
+  const eliminarTipoPaquete = async (item: TipoPaquete) => {
     const confirmado = await confirmar(
       `¿Desea eliminar el paquete folio ${item.folio} - ${item.nombre_cliente}?`,
     );
     if (!confirmado) return;
 
     try {
-      await paqueteAPI.delete(`/${item.folio}`) 
+      await tipoPaqueteAPI.delete(`/${item.folio}`) 
       todosLosPaquetes.value = todosLosPaquetes.value.filter(
         (p) => p.folio !== item.folio,
       );
@@ -88,17 +88,17 @@ export const usePaquetes = () => {
   };
 
   return {
-    paquetesPaginados,
+    tiposPaquetesPaginados,
     totalPaginas,
-    totalPaquetes,
+    totalTiposPaquetes,
     page,
     limit,
     search,
     loading,
-    fetchPaquetes,
-    agregarPaquete,
-    actualizarPaquete,
-    eliminarPaquete,
+    fetchTiposPaquetes,
+    agregarTipoPaquete,
+    actualizarTipoPaquete,
+    eliminarTipoPaquete,
     dialogConfirmar,
     mensajeConfirmar,
     aceptar,

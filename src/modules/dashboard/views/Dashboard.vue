@@ -1,23 +1,15 @@
 <script setup lang="ts">
 import { useDashboard } from "../controllers/useDashboard";
 import "./dashboard.style.css";
-import { useAuthStore } from "@/modules/auth/store/auth.store";
+import AppHeader from "@/components/AppHeader.vue";
 
-const authStore = useAuthStore();
 const { catalogItems, navigateTo } = useDashboard();
 </script>
 
 <template>
-  <div class="main-content" theme="light">
-    <div class="header">
-      <div></div>
-      <div class="user-info">
-        <div class="user-details">
-          <span class="user-name">{{ authStore.session?.nombre }}</span>
-          <span class="user-role">{{ authStore.session?.rol }}</span>
-        </div>
-      </div>
-    </div>
+  <div class="main-content">
+    <!-- Header -->
+     <app-header/>
 
     <div class="content-wrapper">
       <h1 class="page-title">Panel de Control</h1>
@@ -38,7 +30,6 @@ const { catalogItems, navigateTo } = useDashboard();
           v-for="item in catalogItems"
           :key="item.title"
           class="catalog-card"
-          theme="light"
           @click="navigateTo(item.route)"
         >
           <div class="card-content">

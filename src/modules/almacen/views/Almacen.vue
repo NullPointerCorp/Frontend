@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from "vue";
 import { useAlmacenes } from "@/modules/almacen/controllers/useAlmacenes";
-import { useAuthStore } from "../../auth/store/auth.store";
 
 import ModalRegistrarAlmacen from "./components/ModalRegistrarAlmacen.vue";
 import ModalConfirmar from "@/components/ModalConfirmar.vue";
 import ModalEditarAlmacen from "./components/ModalEditarAlmacen.vue";
 import Tabla from "@/components/Tabla.vue";
+import AppHeader from "@/components/AppHeader.vue";
 
-const authStore = useAuthStore();
 const modalEditar = ref<any>(null);
 
 const {
@@ -35,18 +34,10 @@ watch(search, () => { page.value = 1; });
 
 <template>
   <v-app>
-    <v-main class="main-content" theme="light">
+    <v-main class="main-content">
 
       <!-- Header -->
-      <div class="header">
-        <div></div>
-        <div class="user-info">
-          <div class="user-details">
-            <span class="user-name">{{ authStore.session?.nombre }}</span>
-            <span class="user-role">{{ authStore.session?.rol }}</span>
-          </div>
-        </div>
-      </div>
+      <AppHeader/>
 
       <div class="content-wrapper">
 

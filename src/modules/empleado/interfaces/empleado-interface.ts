@@ -16,7 +16,7 @@ export interface Empleado {
   sucursal_id: number | null;
   nombre_estado?: string;
   nombre_ciudad?: string;
-  nombre_rol?: string;
+  rol_nombre?: string;
   nombre_sucursal?: string;
 }
 

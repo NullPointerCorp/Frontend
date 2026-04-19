@@ -7,7 +7,8 @@ import type { Empleado } from "@/modules/empleado/interfaces/empleado-interface"
 
 const emit = defineEmits<{ (e: "empleadoEditado", empleado: Empleado): void }>();
 
-const { showToast } = useToast()
+const { showToast } = useToast();
+
 const {
   dialog,
   loading,
@@ -18,8 +19,9 @@ const {
   editarEmpleado,
 } = useEditarEmpleado((empleado) => emit("empleadoEditado", empleado));
 
-const formRef = ref() 
 const { estados, ciudades, loadingEstados, loadingCiudades, estadoSeleccionado, fetchEstados } = useUbicacion();
+
+const formRef = ref();
 
 watch(dialog, async (abierto) => {
   if (abierto) {
@@ -28,14 +30,14 @@ watch(dialog, async (abierto) => {
   }
 });
 
-const guardar = async () => { // ✅ agregado
-  const { valid } = await formRef.value?.validate()
+const guardar = async () => {
+  const { valid } = await formRef.value?.validate();
   if (!valid) {
-    showToast('Por favor corrige los errores del formulario', 'warning')
-    return
+    showToast("Por favor corrige los errores del formulario", "warning");
+    return;
   }
-  await editarEmpleado()
-}
+  await editarEmpleado();
+};
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return;
@@ -51,7 +53,7 @@ defineExpose({ abrirModal });
 
 <template>
   <v-dialog v-model="dialog" max-width="980" persistent>
-    <v-card class="modal-card" theme="light">
+    <v-card class="modal-card">
       <div class="modal-header">
         <button class="back-link" type="button" @click="dialog = false">
           <v-icon size="18">mdi-chevron-left</v-icon>
@@ -148,7 +150,7 @@ defineExpose({ abrirModal });
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Asignación de Rol <span class="required">*</span></label>
-            <v-select v-model="form.rol_id" :items="roles" item-title="nombre_rol" item-value="rol_id"
+            <v-select v-model="form.rol_id" :items="roles" item-title="rol_nombre" item-value="rol_id"
               placeholder="Seleccionar rol del empleado..." variant="outlined" density="comfortable"
               :rules="[v => !!v || 'El rol es requerido']" hide-details="auto" />
           </div>
@@ -165,7 +167,7 @@ defineExpose({ abrirModal });
             <v-icon start>mdi-close</v-icon>
             Cancelar
           </v-btn>
-          <v-btn class="save-btn" type="submit" :loading="loading"> 
+          <v-btn class="save-btn" type="submit" :loading="loading">
             <v-icon start>mdi-content-save-outline</v-icon>
             Confirmar
           </v-btn>

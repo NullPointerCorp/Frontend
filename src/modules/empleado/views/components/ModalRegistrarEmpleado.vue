@@ -4,7 +4,7 @@ import { useRegistrarEmpleado } from "@/modules/empleado/controllers/useRegistra
 import { useUbicacion } from "@/composables/useUbicacion";
 import { useToast } from "@/composables/useToast";
 import type { Empleado } from "@/modules/empleado/interfaces/empleado-interface";
-import type { RolOpcion } from "@/modules/rol/interfaces/rol-interface";
+import type { Rol } from "@/modules/rol/interfaces/rol-interface";
 import type { SucursalOpcion } from "@/composables/useUbicacion";
 
 const { showToast } = useToast();
@@ -17,7 +17,7 @@ const dialog = ref(false);
 const loading = ref(false);
 const formRef = ref();
 const nombreRef = ref();
-const roles = ref<RolOpcion[]>([]);
+const roles = ref<Rol[]>([]);
 const sucursales = ref<SucursalOpcion[]>([]);
 
 watch(dialog, async (abierto) => {
@@ -84,7 +84,7 @@ const guardar = async () => {
   </v-btn>
 
   <v-dialog v-model="dialog" max-width="980" persistent>
-    <v-card class="modal-card" theme="light">
+    <v-card class="modal-card">
       <div class="modal-header">
         <button class="back-link" type="button" @click="cancelar">
           <v-icon size="18">mdi-chevron-left</v-icon>
@@ -196,7 +196,7 @@ const guardar = async () => {
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Asignación de Rol <span class="required">*</span></label>
-            <v-select v-model="form.rol_id" :items="roles" item-title="nombre_rol" item-value="rol_id"
+            <v-select v-model="form.rol_id" :items="roles" item-title="rol_nombre" item-value="rol_id"
               placeholder="Seleccionar rol del empleado..." variant="outlined" density="comfortable" hide-details="auto" />
           </div>
           <div class="form-group">

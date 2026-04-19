@@ -9,7 +9,7 @@ const { email, password, errorMessage, isFormValid, loading, login } = useLogin(
 <template>
   <v-app>
     <v-main class="login-background">
-      <v-card class="login-card" theme="light">
+      <v-card class="login-card">
         
         <div class="login-header">
           <div class="logo-container">

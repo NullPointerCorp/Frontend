@@ -51,18 +51,18 @@ const normalizarEmpleado = (item: any): Empleado => {
   const calle = obtenerTexto(item?.calle, item?.direccion?.calle);
   const numero_exterior = obtenerTexto(item?.numero_exterior, item?.numeroExterior, item?.num_exterior, item?.direccion?.numero_exterior);
   const numero_interior = obtenerTexto(item?.numero_interior, item?.numeroInterior, item?.num_interior, item?.direccion?.numero_interior);
-  const rol_id = obtenerNumero(item?.rol_id, item?.id_rol, item?.rolId, item?.rol?.rol_id);
+  const rol_id = obtenerNumero(item?.rol_id, item?.rol_id, item?.rolId, item?.rol?.rol_id);
   const sucursal_id = obtenerNumero(item?.sucursal_id, item?.id_sucursal, item?.sucursalId, item?.sucursal?.sucursal_id);
   const nombre_estado = obtenerTexto(item?.nombre_estado, item?.estado, item?.estado_nombre, item?.ubicacion?.estado, item?.direccion?.estado);
   const nombre_ciudad = obtenerTexto(item?.nombre_ciudad, item?.ciudad, item?.ciudad_nombre, item?.ubicacion?.ciudad, item?.direccion?.ciudad);
-  const nombre_rol = obtenerTexto(item?.nombre_rol, item?.rol_nombre, item?.rol, item?.rol?.nombre_rol, item?.rol?.nombre);
+  const rol_nombre = obtenerTexto(item?.nombre_rol, item?.rol_nombre, item?.rol, item?.rol?.nombre_rol, item?.rol?.nombre);
   const nombre_sucursal = obtenerTexto(item?.nombre_sucursal, item?.sucursal_nombre, item?.sucursal, item?.nombre_sucural, item?.sucursal?.nombre_sucursal, item?.sucursal?.nombre);
 
   return {
     empleado_id, nombre, apellido_paterno, apellido_materno, telefono, correo,
     ciudad_id, estado_id, colonia, codigo_postal, calle, numero_exterior,
     numero_interior, rol_id, sucursal_id, nombre_estado, nombre_ciudad,
-    nombre_rol, nombre_sucursal,
+    rol_nombre, nombre_sucursal,
   };
 };
 
