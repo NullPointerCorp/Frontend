@@ -64,7 +64,7 @@ export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
       showToast("¡Cliente modificado con éxito!", "success");
       dialog.value = false;
     } catch (error: any) {
-      showToast(error.message || "Error al conectar con el servidor", "error");
+      showToast(error.response?.data?.message || "Error al conectar con el servidor", "error");
     } finally {
       loading.value = false;
     }

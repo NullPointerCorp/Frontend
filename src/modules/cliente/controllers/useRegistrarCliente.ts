@@ -47,8 +47,11 @@ export const useRegistrarCliente = () => {
       showToast('¡Cliente registrado con éxito!', 'success')
       return data
     } catch (error: any) {
-      showToast(error.message || 'Error al registrar cliente', 'error')
-      throw error
+      showToast(
+        error.response?.data?.message || 'Error al registrar cliente',
+        'error'
+      );
+      throw error;
     }
   }
 

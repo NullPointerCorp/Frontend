@@ -14,6 +14,7 @@ export const clienteSchema = z.object({
   apellido_paterno: z
     .string()
     .min(1, "El apellido paterno es requerido")
+    .trim()
     .min(2, "Mínimo 2 caracteres")
     .max(60, "Máximo 60 caracteres")
     .regex(soloLetras, "Solo se permiten letras y espacios"),

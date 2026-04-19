@@ -40,7 +40,7 @@ export const useRegistrarAlmacen = () => {
       showToast(`¡Almacén "${form.nombre_almacen}" registrado con éxito!`, 'success')
       return data
     } catch (error: any) {
-      showToast(error.message || 'Error de conexión con el servidor', 'error')
+      showToast(error.response?.data?.message || 'Error de conexión con el servidor', 'error')
       throw error
     }
   }

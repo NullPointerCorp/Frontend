@@ -46,7 +46,7 @@ export const useEditarAlmacen = (onSuccess: (almacen: Almacen) => void) => {
       showToast("¡Almacén modificado con éxito!", "success");
       dialog.value = false;
     } catch (error: any) {
-      showToast(error.message || "Error al conectar con el servidor", "error");
+      showToast(error.response?.data?.message || "Error al conectar con el servidor", "error");
     } finally {
       loading.value = false;
     }

@@ -86,7 +86,7 @@ export const useRegistrarEmpleado = () => {
       showToast("¡Empleado registrado con éxito!", "success");
       return data;
     } catch (error: any) {
-      showToast(error.message || "Error al registrar empleado", "error");
+      showToast(error.response?.data?.message || "Error al registrar empleado", "error");
       throw error;
     }
   };
