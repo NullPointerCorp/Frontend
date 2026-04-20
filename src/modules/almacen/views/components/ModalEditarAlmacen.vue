@@ -1,30 +1,25 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useEditarAlmacen } from "@/modules/almacen/controllers/useEditarAlmacen"
-import { useToast } from '@/composables/useToast'
-import type { Almacen } from "@/modules/almacen/interfaces/almacen-interface"
+import { onMounted, onUnmounted } from 'vue'
+import { useEditarAlmacen } from '@/modules/almacen/controllers/useEditarAlmacen'
+import type { Almacen } from '@/modules/almacen/interfaces/almacen-interface'
 
-const emit = defineEmits<{ (e: "almacenEditado", almacen: Almacen): void }>()
+const emit = defineEmits<{ (e: 'almacenEditado', almacen: Almacen): void }>()
 
-const { showToast } = useToast()
-const { dialog, loading, form, almacenSeleccionado, abrirModal, editarAlmacen, validate } =
-  useEditarAlmacen((almacen) => emit("almacenEditado", almacen))
-
-const formRef = ref()
-
-const guardar = async () => {
-  const { valid } = await formRef.value?.validate()
-  if (!valid) {
-    showToast('Por favor corrige los errores del formulario', 'warning')
-    return
-  }
-  await editarAlmacen()
-}
+const {
+  dialog,
+  loading,
+  form,
+  erroresForm,
+  almacenSeleccionado,
+  abrirModal,
+  cerrarModal,
+  editarAlmacen,
+} = useEditarAlmacen((almacen) => emit('almacenEditado', almacen))
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return
-  if (e.key === 'Escape') dialog.value = false
-  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) guardar()
+  if (e.key === 'Escape') cerrarModal()
+  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) editarAlmacen()
 }
 
 onMounted(() => window.addEventListener('keydown', handleKeydown))
@@ -38,7 +33,7 @@ defineExpose({ abrirModal })
     <v-card class="modal-card">
 
       <div class="modal-header">
-        <button class="back-link" type="button" @click="dialog = false">
+        <button class="back-link" type="button" @click="cerrarModal">
           <v-icon size="18">mdi-chevron-left</v-icon>
           Volver al Catálogo
         </button>
@@ -48,7 +43,7 @@ defineExpose({ abrirModal })
         </p>
       </div>
 
-      <v-form ref="formRef" @submit.prevent="guardar" class="modal-form">
+      <v-form @submit.prevent="editarAlmacen" class="modal-form">
 
         <div class="form-group full-width">
           <label class="form-label">ID de Almacén</label>
@@ -70,7 +65,7 @@ defineExpose({ abrirModal })
             variant="outlined"
             density="comfortable"
             hide-details="auto"
-            :rules="[validate('nombre_almacen')]"
+            :error-messages="erroresForm.nombre_almacen"
           />
         </div>
 
@@ -86,7 +81,13 @@ defineExpose({ abrirModal })
         </div>
 
         <div class="modal-actions">
-          <v-btn class="cancel-btn" variant="outlined" type="button" @click="dialog = false" :disabled="loading">
+          <v-btn
+            class="cancel-btn"
+            variant="outlined"
+            type="button"
+            :disabled="loading"
+            @click="cerrarModal"
+          >
             <v-icon start>mdi-close</v-icon>
             Cancelar
           </v-btn>

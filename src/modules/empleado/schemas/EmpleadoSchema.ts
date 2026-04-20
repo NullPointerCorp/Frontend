@@ -28,9 +28,7 @@ export const empleadoSchema = z.object({
     .min(1, "El teléfono es requerido")
     .min(10, "Mínimo 10 dígitos"),
 
-  password: z
-    .string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres"),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
 
   confirm_password: z.string(),
 
@@ -43,3 +41,12 @@ export const empleadoSchema = z.object({
   rol_id: z.number({ message: "El rol es requerido" }),
   sucursal_id: z.number({ message: "La sucursal es requerida" }),
 });
+
+export const actualizarEmpleadoSchema = empleadoSchema.omit({
+  correo: true,
+  password: true,
+  confirm_password: true,
+});
+
+export type EmpleadoInput = z.infer<typeof empleadoSchema>;
+export type ActualizarEmpleadoInput = z.infer<typeof actualizarEmpleadoSchema>;

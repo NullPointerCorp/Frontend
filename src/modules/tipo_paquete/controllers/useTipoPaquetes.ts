@@ -25,12 +25,10 @@ export const useTipoPaquete = () => {
     const q = search.value.toLowerCase();
     return todosLosPaquetes.value.filter(
       (p) =>
-        p.folio?.toString().includes(q) ||
-        p.nombre_cliente?.toLowerCase().includes(q) ||
-        p.tamano?.toLowerCase().includes(q) || 
+        p.tipo_paquete_id?.toString().includes(q) ||
+        p.tamanio?.toLowerCase().includes(q) || 
         p.forma?.toLowerCase().includes(q) ||
-        p.precio?.toString().includes(q) ||
-        p.peso?.toString().includes(q),
+        p.precio?.toString().includes(q)
     );
   });
 
@@ -63,20 +61,20 @@ export const useTipoPaquete = () => {
 
   const actualizarTipoPaquete = (paquete: TipoPaquete) => {
     todosLosPaquetes.value = todosLosPaquetes.value.map((p) =>
-      p.folio === paquete.folio ? paquete : p,
+      p.tipo_paquete_id === paquete.tipo_paquete_id ? paquete : p,
     );
   };
 
   const eliminarTipoPaquete = async (item: TipoPaquete) => {
     const confirmado = await confirmar(
-      `¿Desea eliminar el paquete folio ${item.folio} - ${item.nombre_cliente}?`,
+      `¿Desea eliminar el paquete ID ${item.tipo_paquete_id} - ${item.tamanio} - ${item.forma}?`,
     );
     if (!confirmado) return;
 
     try {
-      await tipoPaqueteAPI.delete(`/${item.folio}`) 
+      await tipoPaqueteAPI.delete(`/${item.tipo_paquete_id}`) 
       todosLosPaquetes.value = todosLosPaquetes.value.filter(
-        (p) => p.folio !== item.folio,
+        (p) => p.tipo_paquete_id !== item.tipo_paquete_id,
       );
       showToast("¡Paquete eliminado con éxito!", "success");
     } catch (error: any) {

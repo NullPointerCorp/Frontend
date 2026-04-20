@@ -1,83 +1,50 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRegistrarSucursal } from '@/modules/sucursal/controllers/useRegistrarSucursal'
-import { useUbicacion } from '@/composables/useUbicacion'
-import { useToast } from '@/composables/useToast'
 import type { Sucursal } from '@/modules/sucursal/interfaces/sucursal-interface'
-
-const { showToast } = useToast()
-const { form, resetForm, registrarSucursal, validate } = useRegistrarSucursal()
-const {
-  estados,
-  ciudades,
-  supervisores,
-  loadingSupervisores,
-  loadingEstados,
-  loadingCiudades,
-  estadoSeleccionado,
-  fetchEstados,
-  fetchSupervisores,
-} = useUbicacion()
 
 const emit = defineEmits<{
   sucursalCreada: [sucursal: Sucursal]
 }>()
 
-const dialog = ref(false)
-const loading = ref(false)
-const formRef = ref()
+const {
+  dialog,
+  loading,
+  form,
+  erroresForm,
+  estados,
+  ciudades,
+  supervisores,
+  loadingEstados,
+  loadingCiudades,
+  loadingSupervisores,
+  estadoSeleccionado,
+  abrirModal,
+  cerrarModal,
+  registrarSucursal,
+} = useRegistrarSucursal((sucursal) => emit('sucursalCreada', sucursal))
+
 const nombreRef = ref()
 
 watch(dialog, async (abierto) => {
   if (abierto) {
     await nextTick()
     nombreRef.value?.focus()
-    await Promise.all([fetchEstados(), fetchSupervisores()])
   }
-})
-
-watch(estadoSeleccionado, (anterior) => {
-  if (anterior !== null) form.ciudad_id = null
 })
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return
-  if (e.key === 'Escape') cancelar()
-  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) guardar()
+  if (e.key === 'Escape') cerrarModal()
+  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) registrarSucursal()
 }
 
 onMounted(() => window.addEventListener('keydown', handleKeydown))
 onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
-
-const cancelar = () => {
-  dialog.value = false
-  setTimeout(() => {
-    resetForm()
-    estadoSeleccionado.value = null
-    formRef.value?.resetValidation()
-  }, 300)
-}
-
-const guardar = async () => {
-  const { valid } = await formRef.value?.validate()
-  if (!valid) {
-    showToast('Por favor corrige los errores del formulario', 'warning') 
-    return
-  }
-  loading.value = true
-  try {
-    const nuevaSucursal = await registrarSucursal()
-    emit('sucursalCreada', nuevaSucursal)
-    cancelar()
-  } catch {
-  } finally {
-    loading.value = false
-  }
-}
 </script>
 
 <template>
-  <v-btn color="primary" class="register-btn" @click="dialog = true">
+  <v-btn color="primary" class="register-btn" @click="abrirModal">
     <v-icon start>mdi-plus</v-icon>
     Registrar Nueva Sucursal
   </v-btn>
@@ -86,7 +53,7 @@ const guardar = async () => {
     <v-card class="modal-card">
 
       <div class="modal-header">
-        <button class="back-link" type="button" @click="cancelar">
+        <button class="back-link" type="button" @click="cerrarModal">
           <v-icon size="18">mdi-chevron-left</v-icon>
           Volver al Catálogo
         </button>
@@ -94,9 +61,8 @@ const guardar = async () => {
         <p class="modal-subtitle">Complete los detalles operativos para dar de alta una nueva sede en el sistema.</p>
       </div>
 
-      <v-form ref="formRef" @submit.prevent="guardar" class="modal-form">
+      <v-form @submit.prevent="registrarSucursal" class="modal-form">
 
-        <!-- Nombre y Supervisor -->
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">
@@ -110,33 +76,31 @@ const guardar = async () => {
               variant="outlined"
               density="comfortable"
               hide-details="auto"
-              :rules="[validate('nombre_sucursal')]"
+              :error-messages="erroresForm.nombre_sucursal"
             />
           </div>
           <div class="form-group">
             <label class="form-label">Supervisor de sucursal (si aplica)</label>
             <v-select
-            v-model="form.empleado_id_supervisor"
-            :items="supervisores"
-            :item-title="(s: any) => `${s.nombre} ${s.apellido_paterno}`"
-            item-value="empleado_id"
-            placeholder="Seleccionar supervisor"
-            variant="outlined"
-            density="comfortable"
-            hide-details="auto"
-            :loading="loadingSupervisores"
-            clearable
-          />
+              v-model="form.empleado_id_supervisor"
+              :items="supervisores"
+              :item-title="(s: any) => `${s.nombre} ${s.apellido_paterno}`"
+              item-value="empleado_id"
+              placeholder="Seleccionar supervisor"
+              variant="outlined"
+              density="comfortable"
+              hide-details="auto"
+              :loading="loadingSupervisores"
+              clearable
+            />
           </div>
         </div>
 
-        <!-- Sección Localización -->
         <div class="form-section-title">
           <v-icon size="16">mdi-map-marker-outline</v-icon>
           LOCALIZACIÓN
         </div>
 
-        <!-- Estado y Ciudad -->
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Estado <span class="required">*</span></label>
@@ -165,12 +129,11 @@ const guardar = async () => {
               hide-details="auto"
               :loading="loadingCiudades"
               :disabled="!estadoSeleccionado"
-              :rules="[validate('ciudad_id')]"
+              :error-messages="erroresForm.ciudad_id"
             />
           </div>
         </div>
 
-        <!-- Colonia, CP y Calle -->
         <div class="form-row-three">
           <div class="form-group">
             <label class="form-label">Colonia <span class="required">*</span></label>
@@ -180,7 +143,7 @@ const guardar = async () => {
               variant="outlined"
               density="comfortable"
               hide-details="auto"
-              :rules="[validate('colonia')]"
+              :error-messages="erroresForm.colonia"
             />
           </div>
           <div class="form-group">
@@ -192,7 +155,7 @@ const guardar = async () => {
               density="comfortable"
               hide-details="auto"
               maxlength="5"
-              :rules="[validate('codigo_postal')]"
+              :error-messages="erroresForm.codigo_postal"
             />
           </div>
           <div class="form-group">
@@ -203,12 +166,11 @@ const guardar = async () => {
               variant="outlined"
               density="comfortable"
               hide-details="auto"
-              :rules="[validate('calle')]"
+              :error-messages="erroresForm.calle"
             />
           </div>
         </div>
 
-        <!-- Número Exterior e Interior -->
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Numero Exterior <span class="required">*</span></label>
@@ -217,7 +179,7 @@ const guardar = async () => {
               variant="outlined"
               density="comfortable"
               hide-details="auto"
-              :rules="[validate('numero_exterior')]"
+              :error-messages="erroresForm.numero_exterior"
             />
           </div>
           <div class="form-group">
@@ -231,13 +193,11 @@ const guardar = async () => {
           </div>
         </div>
 
-        <!-- Sección Ubicación -->
         <div class="form-section-title">
           <v-icon size="16">mdi-crosshairs-gps</v-icon>
           UBICACIÓN
         </div>
 
-        <!-- Longitud y Latitud -->
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Longitud</label>
@@ -262,7 +222,7 @@ const guardar = async () => {
         </div>
 
         <div class="modal-actions">
-          <v-btn class="cancel-btn" variant="outlined" type="button" @click="cancelar" :disabled="loading">
+          <v-btn class="cancel-btn" variant="outlined" type="button" :disabled="loading" @click="cerrarModal">
             <v-icon start>mdi-close</v-icon> Cancelar
           </v-btn>
           <v-btn class="save-btn" type="submit" :loading="loading">

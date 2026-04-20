@@ -1,82 +1,133 @@
-import { ref } from "vue";
-import type { Cliente, ActualizarClienteDTO } from "@/modules/cliente/interfaces/cliente-interface";
-import { useZodValidation } from "@/composables/useZodValidation";
-import { actualizarClienteSchema } from "@/modules/cliente/schemas/ClienteSchema";
+import { ref, watch } from 'vue'
+import { actualizarClienteSchema } from '@/modules/cliente/schemas/ClienteSchema'
+import type { Cliente, ActualizarClienteDTO } from '@/modules/cliente/interfaces/cliente-interface'
 import { useToast } from '@/composables/useToast'
-import clienteAPI from "../api/clienteAPI";
+import clienteAPI from '../api/clienteAPI'
 
 interface FormEditarCliente {
-  cliente_id: number;
-  nombre: string;
-  apellido_paterno: string;
-  apellido_materno: string;
-  correo: string;
-  telefono: string;
+  nombre: string
+  apellido_paterno: string
+  apellido_materno: string
+  correo: string
+  telefono: string
 }
 
 export const useEditarCliente = (onSuccess: (cliente: Cliente) => void) => {
-  const { validate } = useZodValidation(actualizarClienteSchema)
   const { showToast } = useToast()
 
-  const dialog = ref(false);
-  const loading = ref(false);
-  const clienteSeleccionado = ref<Cliente | null>(null);
+  const dialog = ref(false)
+  const loading = ref(false)
+  const clienteSeleccionado = ref<Cliente | null>(null)
+  const erroresForm = ref<Record<string, string>>({})
 
   const form = ref<FormEditarCliente>({
-    cliente_id: 0,
-    nombre: "",
-    apellido_paterno: "",
-    apellido_materno: "",
-    correo: "",
-    telefono: "",
-  });
+    nombre: '',
+    apellido_paterno: '',
+    apellido_materno: '',
+    correo: '',
+    telefono: '',
+  })
+
+  const resetErrores = () => {
+    erroresForm.value = {}
+  }
+
+  watch(dialog, (abierto) => {
+    if (!abierto) resetErrores()
+  })
+
+  const camposValidados = ['nombre', 'apellido_paterno', 'apellido_materno', 'telefono'] as const
+  camposValidados.forEach((campo) => {
+    watch(
+      () => form.value[campo],
+      () => delete erroresForm.value[campo]
+    )
+  })
 
   const abrirModal = (cliente: Cliente) => {
-    clienteSeleccionado.value = cliente;
+    clienteSeleccionado.value = cliente
     form.value = {
-      cliente_id: cliente.cliente_id,
       nombre: cliente.nombre,
       apellido_paterno: cliente.apellido_paterno,
-      apellido_materno: cliente.apellido_materno ?? "",
+      apellido_materno: cliente.apellido_materno ?? '',
       correo: cliente.correo,
-      telefono: cliente.telefono ?? "",
-    };
-    dialog.value = true;
-  };
+      telefono: cliente.telefono ?? '',
+    }
+    resetErrores()
+    dialog.value = true
+  }
 
-  const prepararDatos = (): ActualizarClienteDTO => ({
-    nombre: form.value.nombre.trim(),
-    apellido_paterno: form.value.apellido_paterno.trim(),
-    apellido_materno: form.value.apellido_materno.trim() || null,
-    telefono: form.value.telefono.trim(),
-  });
+  const cerrarModal = () => {
+    dialog.value = false
+  }
 
-  const editarCliente = async () => {
-    if (!clienteSeleccionado.value) return;
+  const validarFormulario = (): ActualizarClienteDTO | null => {
+    const resultado = actualizarClienteSchema.safeParse({
+      nombre: form.value.nombre,
+      apellido_paterno: form.value.apellido_paterno,
+      apellido_materno: form.value.apellido_materno,
+      telefono: form.value.telefono,
+    })
 
-    loading.value = true;
+    if (!resultado.success) {
+      const campos = resultado.error.flatten().fieldErrors
+      const errores: Record<string, string> = {}
+      for (const [key, mensajes] of Object.entries(campos)) {
+        errores[key] = mensajes?.[0] ?? ''
+      }
+      erroresForm.value = errores
+      return null
+    }
+
+    return {
+      nombre: resultado.data.nombre,
+      apellido_paterno: resultado.data.apellido_paterno,
+      apellido_materno: resultado.data.apellido_materno || null,
+      telefono: resultado.data.telefono,
+    }
+  }
+
+  const getMensajeError = (error: unknown): string => {
+    if (typeof error === 'object' && error !== null && 'response' in error) {
+      const respuesta = (error as { response?: { data?: { message?: string } } }).response
+      return respuesta?.data?.message ?? 'Error al conectar con el servidor'
+    }
+    return 'Error al conectar con el servidor'
+  }
+
+  const editarCliente = async (): Promise<void> => {
+    if (!clienteSeleccionado.value) return
+
+    const datos = validarFormulario()
+    if (!datos) {
+      showToast('Por favor corrige los errores del formulario', 'warning')
+      return
+    }
+
+    loading.value = true
     try {
       const { data } = await clienteAPI.put<Cliente>(
         `/${clienteSeleccionado.value.cliente_id}`,
-        prepararDatos()
-      );
-      onSuccess(data);
-      showToast("¡Cliente modificado con éxito!", "success");
-      dialog.value = false;
-    } catch (error: any) {
-      showToast(error.response?.data?.message || "Error al conectar con el servidor", "error");
+        datos
+      )
+      onSuccess(data)
+      showToast('¡Cliente modificado con éxito!', 'success')
+      cerrarModal()
+    } catch (error: unknown) {
+      showToast(getMensajeError(error), 'error')
     } finally {
-      loading.value = false;
+      loading.value = false
     }
-  };
+  }
 
   return {
     dialog,
     loading,
     form,
+    erroresForm,
     clienteSeleccionado,
     abrirModal,
+    cerrarModal,
     editarCliente,
-    validate,
-  };
-};
+  }
+}

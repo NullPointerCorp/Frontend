@@ -1,30 +1,25 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useEditarCliente } from "@/modules/cliente/controllers/useEditarCliente";
-import { useToast } from '@/composables/useToast'
-import type { Cliente } from "../../interfaces/cliente-interface";
+import { onMounted, onUnmounted } from 'vue'
+import { useEditarCliente } from '@/modules/cliente/controllers/useEditarCliente'
+import type { Cliente } from '../../interfaces/cliente-interface'
 
-const emit = defineEmits<{ (e: "clienteEditado", cliente: Cliente): void }>()
+const emit = defineEmits<{ (e: 'clienteEditado', cliente: Cliente): void }>()
 
-const { showToast } = useToast()
-const { dialog, loading, form, clienteSeleccionado, abrirModal, editarCliente, validate } =
-  useEditarCliente((cliente) => emit("clienteEditado", cliente))
-
-const formRef = ref() 
-
-const guardar = async () => {
-  const { valid } = await formRef.value?.validate()
-  if (!valid) {
-    showToast('Por favor corrige los errores del formulario', 'warning') 
-    return
-  }
-  await editarCliente()
-}
+const {
+  dialog,
+  loading,
+  form,
+  erroresForm,
+  clienteSeleccionado,
+  abrirModal,
+  cerrarModal,
+  editarCliente,
+} = useEditarCliente((cliente) => emit('clienteEditado', cliente))
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return
-  if (e.key === 'Escape') dialog.value = false
-  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) guardar() 
+  if (e.key === 'Escape') cerrarModal()
+  if (e.key === 'Enter' && !(e.target instanceof HTMLInputElement)) editarCliente()
 }
 
 onMounted(() => window.addEventListener('keydown', handleKeydown))
@@ -38,7 +33,7 @@ defineExpose({ abrirModal })
     <v-card class="modal-card">
 
       <div class="modal-header">
-        <button class="back-link" type="button" @click="dialog = false">
+        <button class="back-link" type="button" @click="cerrarModal">
           <v-icon size="18">mdi-chevron-left</v-icon>
           Volver al Catálogo
         </button>
@@ -48,7 +43,7 @@ defineExpose({ abrirModal })
         </p>
       </div>
 
-      <v-form ref="formRef" @submit.prevent="guardar" class="modal-form">
+      <v-form @submit.prevent="editarCliente" class="modal-form">
 
         <div class="form-group full-width">
           <label class="form-label">ID de Cliente</label>
@@ -62,8 +57,8 @@ defineExpose({ abrirModal })
             placeholder="Ej. Luis Enrique"
             variant="outlined"
             density="comfortable"
-            :rules="[validate('nombre')]"
             hide-details="auto"
+            :error-messages="erroresForm.nombre"
           />
         </div>
 
@@ -75,8 +70,8 @@ defineExpose({ abrirModal })
               placeholder="Ej. Pérez"
               variant="outlined"
               density="comfortable"
-              :rules="[validate('apellido_paterno')]"
               hide-details="auto"
+              :error-messages="erroresForm.apellido_paterno"
             />
           </div>
           <div class="form-group">
@@ -86,8 +81,8 @@ defineExpose({ abrirModal })
               placeholder="Ej. López"
               variant="outlined"
               density="comfortable"
-              :rules="[validate('apellido_materno')]"
               hide-details="auto"
+              :error-messages="erroresForm.apellido_materno"
             />
           </div>
         </div>
@@ -110,19 +105,21 @@ defineExpose({ abrirModal })
               placeholder="1234567890"
               variant="outlined"
               density="comfortable"
-              :rules="[validate('telefono')]"
               hide-details="auto"
               maxlength="10"
+              :error-messages="erroresForm.telefono"
             />
           </div>
         </div>
 
         <div class="modal-actions">
-          <v-btn class="cancel-btn" variant="outlined" type="button" @click="dialog = false" :disabled="loading">
-            <v-icon start>mdi-close</v-icon> Cancelar
+          <v-btn class="cancel-btn" variant="outlined" type="button" :disabled="loading" @click="cerrarModal">
+            <v-icon start>mdi-close</v-icon>
+            Cancelar
           </v-btn>
           <v-btn class="save-btn" type="submit" :loading="loading">
-            <v-icon start>mdi-content-save-outline</v-icon> Guardar Cliente
+            <v-icon start>mdi-content-save-outline</v-icon>
+            Guardar Cliente
           </v-btn>
         </div>
 

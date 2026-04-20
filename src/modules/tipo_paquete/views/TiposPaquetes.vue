@@ -66,8 +66,8 @@ watch(search, () => { page.value = 1; });
         <Tabla
           item-key="folio"
           :headers="[
-            { title: 'Folio', key: 'folio' },
-            { title: 'Tamaño', key: 'tamano' },
+            { title: 'ID', key: 'tipo_paquete_id' },
+            { title: 'Tamaño', key: 'tamanio' },
             { title: 'Forma', key: 'forma' },
             { title: 'Precio', key: 'precio' },
             { title: 'Acciones', key: 'acciones', sortable: false }
