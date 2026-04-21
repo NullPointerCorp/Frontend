@@ -4,15 +4,15 @@ import { useAuthStore } from "@/modules/auth/store/auth.store";
 
 const allItems = [
   { icon: 'mdi-view-dashboard', title: 'Dashboard', route: '/dashboard', roles: [1, 2, 3] },
-  { icon: 'mdi-store', title: 'Sucursales', route: '/sucursales', roles: [1, 2] },
-  { icon: 'mdi-warehouse', title: 'Almacenes', route: '/almacenes', roles: [1, 2] },
-  { icon: 'mdi-shield-account', title: 'Roles', route: '/roles', roles: [1, 2] },
-  { icon: 'mdi-badge-account', title: 'Empleados', route: '/empleados', roles: [1] },
-  { icon: 'mdi-truck', title: 'Transporte', route: '/transporte', roles: [1, 2] },
-  { icon: 'mdi-account-group', title: 'Clientes', route: '/clientes', roles: [1, 2] },
-  { icon: 'mdi-package-variant-closed', title: 'Tipos de paquetes', route: '/tipos-paquete', roles: [1, 2, 3] },
+  { icon: 'mdi-store', title: 'Sucursales', route: '/sucursales', roles: [1] },
+  { icon: 'mdi-warehouse', title: 'Almacenes', route: '/almacenes', roles: [1] },
+  { icon: 'mdi-shield-account', title: 'Roles', route: '/roles', roles: [1] },
+  { icon: 'mdi-badge-account', title: 'Empleados', route: '/empleados', roles: [1,2] },
+  { icon: 'mdi-truck', title: 'Transporte', route: '/transporte', roles: [1] },
+  { icon: 'mdi-account-group', title: 'Clientes', route: '/clientes', roles: [1, 2, 3] },
+  { icon: 'mdi-package-variant-closed', title: 'Tipos de paquetes', route: '/tipos-paquete', roles: [1] },
   { icon: 'mdi-airplane', title: 'Listar Envíos', route: '/envios', roles: [1, 2, 3] },
-  { icon: 'mdi-airplane', title: 'Registrar Envío', route: '/registrar-envio', roles: [1, 2, 3] },
+  { icon: 'mdi-cube-send', title: 'Registrar Envío', route: '/registrar-envio', roles: [1, 2, 3] },
   { icon: 'mdi-airplane-off', title: 'Cancelar Envío', route: '/cancelar-envio', roles: [1, 2, 3] },
 ];
 

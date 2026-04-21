@@ -51,14 +51,12 @@ export const useRegistrarAlmacen = (onSuccess: (almacen: Almacen) => void) => {
     ciudadSeleccionada.value = null
   }
 
-  // Limpia sucursal al cambiar de ciudad
   watch(ciudadSeleccionada, (nuevo, anterior) => {
     if (anterior !== null) {
       form.sucursal_id = null
     }
   })
 
-  // Limpia el error del campo cuando el usuario lo edita
   const camposValidados = ['nombre_almacen', 'sucursal_id', 'descripcion'] as const
   camposValidados.forEach((campo) => {
     watch(() => form[campo], () => {

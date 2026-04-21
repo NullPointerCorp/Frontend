@@ -24,7 +24,6 @@ const {
 
 const nombreRef = ref()
 
-// Foco inicial al abrir el modal
 watch(dialog, async (abierto) => {
   if (abierto) {
     await nextTick()

@@ -108,7 +108,6 @@ export const useRegistrarTransporte = (onSuccess: (transporte: Transporte) => vo
     erroresForm.value = {}
   }
 
-  // Filtra subtipos al cambiar tipo y resetea subtipo
   watch(() => form.tipo_id, (nuevo) => {
     form.subtipo_id = null
     subtiposFiltrados.value = nuevo

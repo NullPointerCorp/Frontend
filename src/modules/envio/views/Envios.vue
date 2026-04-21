@@ -2,8 +2,6 @@
 import { onMounted, watch, ref } from "vue";
 import { useEnvios } from "../controllers/useEnvios";
 
-//import ModalRegistrarRol from "./components/ModalRegistrarRol.vue";
-//import ModalEditarRol from "./components/ModalEditarRol.vue";
 import ModalConfirmar from "@/components/ModalConfirmar.vue";
 
 import Tabla from "@/components/Tabla.vue";

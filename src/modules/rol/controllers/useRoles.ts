@@ -27,7 +27,6 @@ export const useRol = () => {
       (p) =>
         p.rol_id?.toString().includes(q) ||
         p.rol_nombre?.toLowerCase().includes(q) 
-        //p.peso?.toString().includes(q),
     );
   });
 

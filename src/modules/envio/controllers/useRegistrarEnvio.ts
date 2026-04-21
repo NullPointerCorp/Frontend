@@ -12,13 +12,11 @@ export const useRegistrarEnvio = (onEnvioCreado: (envio: any) => void) => {
   const { showToast } = useToast();
   const loading = ref(false);
 
-  // Cliente
   const correoCliente = ref("");
   const clienteEncontrado = ref<any>(null);
   const loadingCliente = ref(false);
   const errorCliente = ref("");
 
-  // Catálogos
   const tiposPaquete = ref<any[]>([]);
   const tiposTransporte = ref<any[]>([]);
   const todosLosSubtipos = ref<any[]>([]);
@@ -26,7 +24,6 @@ export const useRegistrarEnvio = (onEnvioCreado: (envio: any) => void) => {
   const todosLosTransportes = ref<any[]>([]);
   const transportes = ref<any[]>([]);
 
-  // Ubicación
   const estados = ref<any[]>([]);
   const ciudadesDestino = ref<any[]>([]);
   const sucursalesDestino = ref<any[]>([]);
@@ -103,7 +100,6 @@ export const useRegistrarEnvio = (onEnvioCreado: (envio: any) => void) => {
     }
   };
 
-  // Cascada destino
   watch(estadoDestino, async (val) => {
     ciudadDestino.value = null;
     ciudadesDestino.value = [];
@@ -132,7 +128,6 @@ export const useRegistrarEnvio = (onEnvioCreado: (envio: any) => void) => {
     }
   });
 
-  // Cascada transporte (filtrado en cliente)
   const tipoTransporteSeleccionado = ref<number | null>(null);
   const subtipoSeleccionado = ref<number | null>(null);
 

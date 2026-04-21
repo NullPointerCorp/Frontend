@@ -75,12 +75,10 @@ export const useRegistrarEmpleado = (onSuccess: (empleado: Empleado) => void) =>
     estadoSeleccionado.value = null
   }
 
-  // Limpia ciudad al cambiar de estado
   watch(estadoSeleccionado, (_, anterior) => {
     if (anterior !== null) form.ciudad_id = null
   })
 
-  // Limpia errores por campo al editar
   const camposTexto = [
     'nombre', 'apellido_paterno', 'apellido_materno', 'telefono', 'correo',
     'password', 'confirm_password', 'colonia', 'codigo_postal', 'calle',

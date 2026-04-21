@@ -26,12 +26,10 @@ export const useEditarRol = (onSuccess: (rol: Rol) => void) => {
     erroresForm.value = {};
   };
 
-  // Limpia errores al cerrar el modal
   watch(dialog, (abierto) => {
     if (!abierto) resetErrores();
   });
 
-  // Limpia el error del campo cuando el usuario lo edita
   watch(
     () => form.value.rol_nombre,
     () => delete erroresForm.value.rol_nombre,

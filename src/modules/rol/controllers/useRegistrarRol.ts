@@ -30,7 +30,6 @@ export const useRegistrarRol = (onSuccess: (rol: Rol) => void) => {
     erroresForm.value = {};
   };
 
-  // Limpia el error del campo cuando el usuario lo edita
   watch(
     () => form.rol_nombre,
     () => delete erroresForm.value.rol_nombre
@@ -48,7 +47,6 @@ export const useRegistrarRol = (onSuccess: (rol: Rol) => void) => {
 
   const cerrarModal = () => {
     dialog.value = false;
-    // Espera la animación de cierre antes de limpiar
     setTimeout(() => {
       resetForm();
       resetErrores();

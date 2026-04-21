@@ -26,9 +26,9 @@ const vuetify = createVuetify({
       light: {
         dark: false,
         colors: {
-          primary: '#1565C0',     // el azul de tus botones/menú activo
-          background: '#F5F7FA',  // fondo general gris claro
-          surface: '#FFFFFF',     // sidebar, header, cards (blanco)
+          primary: '#1565C0',     
+          background: '#F5F7FA',
+          surface: '#FFFFFF',    
           error: '#D32F2F',
         },
       },
@@ -36,8 +36,8 @@ const vuetify = createVuetify({
         dark: true,
         colors: {
           primary: '#2196F3', 
-          background: '#121212',  // negro Material Design
-          surface: '#1E1E1E',     // gris muy oscuro para sidebar/header
+          background: '#121212',  
+          surface: '#1E1E1E',     
           success: '#66BB6A',
           error: '#CF6679',
         },
