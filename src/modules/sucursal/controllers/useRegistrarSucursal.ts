@@ -34,9 +34,6 @@ const formInicial = (): FormRegistrarSucursal => ({
 export const useRegistrarSucursal = (onSuccess: (sucursal: Sucursal) => void) => {
   const { showToast } = useToast()
 
-  // ==========================================
-  // Ubicación (selects en cascada)
-  // ==========================================
   const {
     estados,
     ciudades,
@@ -49,9 +46,6 @@ export const useRegistrarSucursal = (onSuccess: (sucursal: Sucursal) => void) =>
     fetchSupervisores,
   } = useUbicacion()
 
-  // ==========================================
-  // Estado de la UI
-  // ==========================================
   const dialog = ref(false)
   const loading = ref(false)
   const erroresForm = ref<Record<string, string>>({})

@@ -12,6 +12,8 @@ import TiposPaquetes from "@/modules/tipo_paquete/views/TiposPaquetes.vue";
 import Almacenes from "@/modules/almacen/views/Almacen.vue";
 import empleados from "@/modules/empleado/views/Empleados.vue"
 import Roles from "@/modules/rol/views/Roles.vue";
+import Envios from "@/modules/envio/views/Envios.vue";
+import RegistrarEnvio from "@/modules/envio/views/RegistrarEnvio.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -33,6 +35,9 @@ const routes = [
       { path: "transporte", component: Transportes },
       { path: "clientes", component: Clientes },
       { path: "tipos-paquete", component: TiposPaquetes },
+      { path: "envios", component: Envios },
+      { path: "registrar-envio", component: RegistrarEnvio },
+
     ]
   }
 ];

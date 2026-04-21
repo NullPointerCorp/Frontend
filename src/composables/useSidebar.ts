@@ -11,6 +11,8 @@ const allItems = [
   { icon: 'mdi-truck', title: 'Transporte', route: '/transporte', roles: [1, 2] },
   { icon: 'mdi-account-group', title: 'Clientes', route: '/clientes', roles: [1, 2] },
   { icon: 'mdi-package-variant-closed', title: 'Tipos de paquetes', route: '/tipos-paquete', roles: [1, 2, 3] },
+  { icon: 'mdi-airplane', title: 'Listar Envíos', route: '/envios', roles: [1, 2, 3] },
+  { icon: 'mdi-airplane', title: 'Registrar Envío', route: '/registrar-envio', roles: [1, 2, 3] },
 ];
 
 export const useSidebar = () => {
