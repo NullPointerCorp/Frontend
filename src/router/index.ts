@@ -14,6 +14,7 @@ import empleados from "@/modules/empleado/views/Empleados.vue"
 import Roles from "@/modules/rol/views/Roles.vue";
 import Envios from "@/modules/envio/views/Envios.vue";
 import RegistrarEnvio from "@/modules/envio/views/RegistrarEnvio.vue";
+import CancelarEnvio from "@/modules/envio/views/CancelarEnvio.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -37,6 +38,7 @@ const routes = [
       { path: "tipos-paquete", component: TiposPaquetes },
       { path: "envios", component: Envios },
       { path: "registrar-envio", component: RegistrarEnvio },
+      { path: "cancelar-envio", component: CancelarEnvio },
 
     ]
   }

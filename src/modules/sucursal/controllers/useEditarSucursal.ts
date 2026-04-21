@@ -67,8 +67,10 @@ export const useEditarSucursal = (onSuccess: (sucursal: Sucursal) => void) => {
       calle: sucursal.calle ?? '',
       numero_exterior: sucursal.numero_exterior ?? '',
       numero_interior: sucursal.numero_interior ?? '',
-      longitud: sucursal.longitud ?? undefined,
-      latitud: sucursal.latitud ?? undefined,
+      longitud: sucursal.longitud != null && !isNaN(Number(sucursal.
+        longitud)) ? Number(sucursal.longitud) : undefined,
+      latitud: sucursal.latitud != null && !isNaN(Number(sucursal.
+        latitud)) ? Number(sucursal.latitud) : undefined,
       empleado_id_supervisor: sucursal.empleado_id_supervisor ?? null,
     }
     resetErrores()
