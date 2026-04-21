@@ -1,6 +1,7 @@
 export interface CrearEnvio {
   correo: string;
   tipo_paquete_id: number | null;
+  forma_paquete: string;
   numero_serie: string;
   descripcion: string;
   fecha_salida: string;
@@ -14,7 +15,7 @@ export interface CrearEnvio {
 
 export interface EnvioConsultaDTO {
   envio_id: number;
-  correo: number;
+  correo: string;
   descripcion: string;
   tamanio: string;
   forma: string;

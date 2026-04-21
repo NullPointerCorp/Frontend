@@ -1,6 +1,6 @@
 import { ref, computed } from "vue";
 import type { Cliente } from "@/modules/cliente/interfaces/cliente-interface";
-import type { Envio, EnvioConsultaDTO } from "../interfaces/envio-interface"; 
+import type { EnvioConsultaDTO } from "../interfaces/envio-interface"; 
 import { useConfirmar } from "@/composables/useConfirmar";
 import { useToast } from "@/composables/useToast";
 import envioAPI from "../api/envioAPI";
@@ -54,30 +54,6 @@ export const useEnvios = () => {
     }
   };
 
-  const agregarEnvio = (cliente: EnvioConsultaDTO) => {
-    todosLosEnvios.value = [...todosLosEnvios.value, cliente];
-  };
-
-  const cancelarEnvio = async (item: Envio) => {
-    const confirmado = await confirmar(
-      `¿Desea eliminar el cliente ${item.cliente_id} - ${item.cliente_id}?`,
-    );
-    if (!confirmado) return;
-
-    try {
-      await envioAPI.delete(`/${item.cliente_id}`)
-      todosLosEnvios.value = todosLosEnvios.value.filter(
-        (c) => c.envio_id !== item.cliente_id,
-      );
-      showToast("Envío cancelado con éxito!", "success");
-    } catch {
-      showToast(
-        "¡No se puede cancelar el envío!",
-        "error",
-      );
-    }
-  };
-
   return {
     enviosPaginados,
     totalPaginas,
@@ -87,8 +63,6 @@ export const useEnvios = () => {
     search,
     loading,
     fetchEnvios,
-    agregarEnvio,
-    cancelarEnvio,
     dialogConfirmar,
     aceptar,
     cancelar,

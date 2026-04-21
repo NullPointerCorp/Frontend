@@ -20,8 +20,6 @@ const {
   search,
   loading,
   fetchEnvios,
-  agregarEnvio,
-  cancelarEnvio,
   dialogConfirmar,
   aceptar,
   cancelar,
@@ -79,10 +77,9 @@ watch(search, () => { page.value = 1; });
           { title: 'Fecha de Llegada', key: 'fecha_llegada' },
           { title: 'Origen', key: 'origen' },
           { title: 'Destino', key: 'destino' },
-          { title: 'Estado de envío', key: 'estado_envio' },
-          { title: 'Acciones', key: 'acciones', sortable: false }
+          { title: 'Estado de envío', key: 'estado_envio' }
         ]" :items="enviosPaginados" :loading="loading" :page="page" :limit="limit" :total-items="totalEnvios"
-          :total-paginas="totalPaginas" @editar="modalEditar?.abrirModal($event)" @eliminar="cancelarEnvio"
+          :total-paginas="totalPaginas"
           @update:page="page = $event" />
 
         <!-- Footer -->
