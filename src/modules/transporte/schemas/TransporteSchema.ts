@@ -6,12 +6,12 @@ export const transporteSchema = z.object({
     .min(1, "El número de serie es requerido")
     .max(30, "Máximo 30 caracteres"),
 
-  empleado_id: z
-    .number({ invalid_type_error: "Selecciona un transportista" })
+  sucursal_id: z
+    .number({ invalid_type_error: "Selecciona una sucursal" })
     .int()
-    .positive("Selecciona un transportista")
+    .positive("Selecciona una sucursal")
     .nullable()
-    .refine((val) => val !== null, "Selecciona un transportista"),
+    .refine((val) => val !== null, "Selecciona una sucursal"),
 
   tipo_id: z
     .number({ invalid_type_error: "Selecciona un tipo de transporte" })
@@ -49,8 +49,7 @@ export const actualizarTransporteSchema = z.object({
     .number({ invalid_type_error: "Selecciona un transportista" })
     .int()
     .positive("Selecciona un transportista")
-    .nullable()
-    .refine((val) => val !== null, "Selecciona un transportista"),
+    .nullable(),
 
   capacidad_carga: z
     .number({ invalid_type_error: "Ingresa un número válido" })

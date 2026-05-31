@@ -3,7 +3,8 @@ import { transporteSchema } from '@/modules/transporte/schemas/TransporteSchema'
 import { useToast } from '@/composables/useToast'
 import type { Transporte, CrearTransporteDTO } from '@/modules/transporte/interfaces/transporte-interface'
 import transporteAPI from '../api/transporteAPI'
-import empleadoAPI from '@/modules/empleado/api/empleadoAPI'
+import sucursalAPI from '@/modules/sucursal/api/sucursalAPI'
+import type { SucursalOpcion } from '@/composables/useUbicacion'
 
 export interface TipoTransporte {
   tipo_id: number
@@ -24,7 +25,7 @@ export interface Transportista {
 
 interface FormRegistrarTransporte {
   numero_serie: string
-  empleado_id: number | null
+  sucursal_id: number | null
   tipo_id: number | null
   subtipo_id: number | null
   capacidad_carga: number | null
@@ -34,7 +35,7 @@ interface FormRegistrarTransporte {
 
 const formInicial = (): FormRegistrarTransporte => ({
   numero_serie: '',
-  empleado_id: null,
+  sucursal_id: null,
   tipo_id: null,
   subtipo_id: null,
   capacidad_carga: null,
@@ -54,10 +55,10 @@ export const useRegistrarTransporte = (onSuccess: (transporte: Transporte) => vo
   const tipos = ref<TipoTransporte[]>([])
   const subtipos = ref<SubtipoTransporte[]>([])
   const subtiposFiltrados = ref<SubtipoTransporte[]>([])
-  const transportistas = ref<Transportista[]>([])
+  const sucursales = ref<SucursalOpcion[]>([])
   const loadingTipos = ref(false)
   const loadingSubtipos = ref(false)
-  const loadingTransportistas = ref(false)
+  const loadingSucursales = ref(false)
 
   const fetchTipos = async () => {
     loadingTipos.value = true
@@ -83,20 +84,20 @@ export const useRegistrarTransporte = (onSuccess: (transporte: Transporte) => vo
     }
   }
 
-  const fetchTransportistas = async () => {
-    loadingTransportistas.value = true
+  const fetchSucursales = async () => {
+    loadingSucursales.value = true
     try {
-      const { data } = await empleadoAPI.get('/transportistas')
-      transportistas.value = Array.isArray(data) ? data : (data?.data ?? [])
+      const { data } = await sucursalAPI.get('/')
+      sucursales.value = Array.isArray(data) ? data : (data?.data ?? [])
     } catch {
-      transportistas.value = []
+      sucursales.value = []
     } finally {
-      loadingTransportistas.value = false
+      loadingSucursales.value = false
     }
   }
 
   const fetchCatalogos = async () => {
-    await Promise.all([fetchTipos(), fetchSubtipos(), fetchTransportistas()])
+    await Promise.all([fetchTipos(), fetchSubtipos(), fetchSucursales()])
   }
 
   const resetForm = () => {
@@ -122,7 +123,7 @@ export const useRegistrarTransporte = (onSuccess: (transporte: Transporte) => vo
     watch(() => form[campo], () => { delete erroresForm.value[campo] })
   })
 
-  const camposSelect = ['empleado_id', 'subtipo_id', 'capacidad_carga'] as const
+  const camposSelect = ['sucursal_id', 'subtipo_id', 'capacidad_carga'] as const
   camposSelect.forEach((campo) => {
     watch(() => form[campo], () => { delete erroresForm.value[campo] })
   })
@@ -157,7 +158,8 @@ export const useRegistrarTransporte = (onSuccess: (transporte: Transporte) => vo
 
     return {
       numero_serie: resultado.data.numero_serie,
-      empleado_id: resultado.data.empleado_id!,
+      sucursal_id: resultado.data.sucursal_id!,
+      empleado_id: null,
       subtipo_id: resultado.data.subtipo_id!,
       capacidad_carga: resultado.data.capacidad_carga!,
       unidad_medida: resultado.data.unidad_medida,
@@ -200,10 +202,10 @@ export const useRegistrarTransporte = (onSuccess: (transporte: Transporte) => vo
     erroresForm,
     tipos,
     subtiposFiltrados,
-    transportistas,
+    sucursales,
     loadingTipos,
     loadingSubtipos,
-    loadingTransportistas,
+    loadingSucursales,
     abrirModal,
     cerrarModal,
     registrarTransporte,

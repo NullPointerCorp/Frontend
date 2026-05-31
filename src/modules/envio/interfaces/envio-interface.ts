@@ -2,13 +2,10 @@ export interface CrearEnvio {
   correo: string;
   tipo_paquete_id: number | null;
   forma_paquete: string;
-  numero_serie: string;
+  numero_serie?: string;
   descripcion: string;
-  fecha_salida: string;
-  fecha_llegada: string;
   estado_envio: string;
   peso: number;
-  origen_id: number | null; 
   destino_id: number | null;
   cliente_id: number | null;
 }
@@ -21,10 +18,10 @@ export interface EnvioConsultaDTO {
   forma: string;
   peso: number;
   nombre_empleado: string; 
-  numero_serie: string;
-  nombre_subtipo: string;
-  fecha_salida: string;
-  fecha_llegada: string;
+  numero_serie: string | null;
+  nombre_subtipo: string | null;
+  fecha_salida: string | null;
+  fecha_llegada: string | null;
   origen: string;          
   destino: string;
   estado_envio: string;

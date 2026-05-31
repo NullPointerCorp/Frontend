@@ -2,17 +2,30 @@
 import { ref, watch, onMounted } from "vue";
 import { useRegistrarEnvio } from "../controllers/useRegistrarEnvio";
 import AppHeader from "@/components/AppHeader.vue";
+import { useClientes } from "@/modules/cliente/controllers/useClientes";
+
+import type { Cliente } from "@/modules/cliente/interfaces/cliente-interface";
+
+const clienteSeleccionado = ref<Cliente | null>(null);
+
+const seleccionarCliente = (cliente: Cliente) => {
+  clienteSeleccionado.value = cliente;
+  clienteEncontrado.value = cliente;
+
+  correoCliente.value = cliente.correo;
+  form.value.correo = cliente.correo;
+  form.value.cliente_id = cliente.cliente_id;
+};
 
 const emit = defineEmits<{ envioCreado: [envio: any] }>();
 
-const ciudadOrigenSeleccionada = ref<number | null>(null);
-const ciudadDestinoSeleccionada = ref<number | null>(null);
+import BuscardorCorreoCliente from "@/components/BuscardorCorreoCliente.vue";
 
 const precioSeleccionado = ref<number | null>(null);
 
 const {
   form, erroresForm, loading,
-  correoCliente, clienteEncontrado, loadingCliente, errorCliente, buscarCliente,
+  correoCliente, clienteEncontrado, errorCliente,
   tiposPaquete, tiposTransporte, subtiposFiltrados, transportes,
   estados, ciudadesDestino, sucursalesDestino,
   estadoDestino, ciudadDestino,
@@ -20,6 +33,11 @@ const {
   loadingEstados, loadingCiudades, loadingSucursales, loadingTransportes,
   fetchCatalogos, registrarEnvio, resetForm,
 } = useRegistrarEnvio((envio) => emit("envioCreado", envio));
+
+const {
+  clientesPaginados,
+  fetchClientes,
+} = useClientes();
 
 watch(() => form.value.tipo_paquete_id, (id) => {
   const seleccionado = tiposPaquete.value.find(
@@ -34,8 +52,21 @@ watch(() => form.value.tipo_paquete_id, (id) => {
   }
 });
 
+onMounted(() => {
+  fetchCatalogos(),
+    fetchClientes()
+});
 
-onMounted(fetchCatalogos);
+watch(clienteSeleccionado, (cliente) => {
+  if (!cliente) {
+    clienteEncontrado.value = null;
+    correoCliente.value = "";
+    form.value.correo = "";
+    form.value.cliente_id = null;
+    errorCliente.value = "";
+  }
+});
+
 </script>
 
 <template>
@@ -60,30 +91,19 @@ onMounted(fetchCatalogos);
               <v-icon size="14" class="mr-1">mdi-account-outline</v-icon>
               Cliente
             </p>
-            <v-row>
-              <v-col cols="12" md="8">
-                <v-text-field v-model="correoCliente" label="Correo del cliente" placeholder="Ej. cliente@correo.com"
-                  variant="outlined" density="comfortable" hide-details="auto" :error-messages="erroresForm.correo"
-                  @keyup.enter="buscarCliente" />
-              </v-col>
-              <v-col cols="12" md="4" class="d-flex align-center">
-                <v-btn variant="outlined" :loading="loadingCliente" @click="buscarCliente" block>
-                  <v-icon start>mdi-magnify</v-icon>
-                  Buscar cliente
-                </v-btn>
+            <v-row align="center">
+              <v-col cols="12" md="6">
+                <BuscardorCorreoCliente v-model="clienteSeleccionado" :items="clientesPaginados"
+                  placeholder="Buscar cliente por nombre..." @seleccionar="seleccionarCliente" />
               </v-col>
 
-              <v-col cols="12" v-if="clienteEncontrado">
+              <v-col cols="12" md="6" v-if="clienteEncontrado">
                 <v-alert type="success" density="compact" variant="tonal">
                   <span class="font-weight-medium">
                     {{ clienteEncontrado.nombre }} {{ clienteEncontrado.apellido_paterno }}
+                    {{ clienteEncontrado.apellido_materno ?? "" }} - 
+                    {{ clienteEncontrado.correo }}
                   </span>
-                  &nbsp;— {{ clienteEncontrado.correo }}
-                </v-alert>
-              </v-col>
-              <v-col cols="12" v-if="errorCliente">
-                <v-alert type="error" density="compact" variant="tonal">
-                  {{ errorCliente }}
                 </v-alert>
               </v-col>
             </v-row>
@@ -110,8 +130,7 @@ onMounted(fetchCatalogos);
               <!-- Peso -->
               <v-col cols="12" md="4">
                 <v-text-field v-model.number="form.peso" label="Peso (kg)" type="number" min="0" step="0.1"
-                  variant="outlined" density="compact" hide-details="auto"
-                  :error-messages="erroresForm.peso" />
+                  variant="outlined" density="compact" hide-details="auto" :error-messages="erroresForm.peso" />
               </v-col>
             </v-row>
 
@@ -119,9 +138,8 @@ onMounted(fetchCatalogos);
             <v-row class="mt-1">
               <v-col cols="12">
                 <v-textarea v-model="form.descripcion" label="Descripción del envío"
-                  placeholder="Ej. Documentos importantes, electrónico frágil…"
-                  variant="outlined" density="comfortable" rows="2" auto-grow hide-details="auto"
-                  :error-messages="erroresForm.descripcion" />
+                  placeholder="Ej. Documentos importantes, electrónico frágil…" variant="outlined" density="comfortable"
+                  rows="2" auto-grow hide-details="auto" :error-messages="erroresForm.descripcion" />
               </v-col>
             </v-row>
 
@@ -129,8 +147,9 @@ onMounted(fetchCatalogos);
 
             <!-- ── DESTINO ── -->
             <p class="text-caption text-medium-emphasis font-weight-medium text-uppercase mb-3">
+              <v-icon size="14" class="mr-1">mdi-store</v-icon>
               <v-icon size="14" class="mr-1">mdi-map-marker-check-outline</v-icon>
-              Destino
+              Sucursal destino
             </p>
             <v-row>
               <v-col cols="12" md="4">
@@ -145,7 +164,7 @@ onMounted(fetchCatalogos);
               </v-col>
               <v-col cols="12" md="4">
                 <v-select v-model="form.destino_id" :items="sucursalesDestino" item-title="nombre_sucursal"
-                  item-value="sucursal_id" label="Sucursal destino" placeholder="Seleccionar sucursal"
+                  item-value="sucursal_id" label="Sucursal" placeholder="Seleccionar sucursal"
                   variant="outlined" density="comfortable" hide-details="auto" :loading="loadingSucursales"
                   :disabled="!ciudadDestino" :error-messages="erroresForm.destino_id" />
               </v-col>
@@ -161,8 +180,8 @@ onMounted(fetchCatalogos);
             <v-row>
               <v-col cols="12" md="4">
                 <v-select v-model="tipoTransporteSeleccionado" :items="tiposTransporte" item-title="nombre_tipo"
-                  item-value="tipo_id" label="Tipo de transporte" placeholder="Seleccionar tipo"
-                  variant="outlined" density="comfortable" hide-details="auto" />
+                  item-value="tipo_id" label="Tipo de transporte" placeholder="Seleccionar tipo" variant="outlined"
+                  density="comfortable" hide-details="auto" />
               </v-col>
               <v-col cols="12" md="4">
                 <v-select v-model="subtipoSeleccionado" :items="subtiposFiltrados" item-title="nombre_subtipo"
@@ -171,9 +190,9 @@ onMounted(fetchCatalogos);
                   :disabled="!tipoTransporteSeleccionado" />
               </v-col>
               <v-col cols="12" md="4">
-                <v-select v-model="form.numero_serie" :items="transportes" item-title="placa"
-                  item-value="numero_serie" label="Matrícula del vehículo" placeholder="Seleccionar vehículo"
-                  variant="outlined" density="comfortable" hide-details="auto" :loading="loadingTransportes"
+                <v-select v-model="form.numero_serie" :items="transportes" item-title="placa" item-value="numero_serie"
+                  label="Matrícula del vehículo" placeholder="Seleccionar vehículo" variant="outlined"
+                  density="comfortable" hide-details="auto" :loading="loadingTransportes"
                   :disabled="!subtipoSeleccionado" :error-messages="erroresForm.numero_serie" />
               </v-col>
             </v-row>

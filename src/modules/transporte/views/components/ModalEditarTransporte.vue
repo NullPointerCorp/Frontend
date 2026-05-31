@@ -13,12 +13,19 @@ const {
   transporteSeleccionado,
   transportistas,
   loadingTransportistas,
+  esSupervisor,
   abrirModal,
   cerrarModal,
   editarTransporte,
 } = useEditarTransporte((transporte) => emit('transporteEditado', transporte))
 
 const unidadesMedida = ['kg', 'ton', 'lb']
+
+const nombreTransportista = (transportista: any) => {
+  const nombre = transportista?.nombre ?? ''
+  const apellido = transportista?.apellido_paterno ?? ''
+  return `${nombre} ${apellido}`.trim() || 'Sin asignar'
+}
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return
@@ -60,17 +67,22 @@ defineExpose({ abrirModal })
         <div class="form-group full-width">
           <label class="form-label">Transportista</label>
           <v-select
+            v-if="esSupervisor"
             v-model="form.empleado_id"
             :items="transportistas"
-            :item-title="(t) => `${t.nombre} ${t.apellido_paterno}`"
+            :item-title="nombreTransportista"
             item-value="empleado_id"
             placeholder="Seleccionar Transportista"
             variant="outlined"
             density="comfortable"
+            clearable
             hide-details="auto"
             :loading="loadingTransportistas"
             :error-messages="erroresForm.empleado_id"
           />
+          <div v-else class="readonly-field">
+            {{ transporteSeleccionado?.transportista ?? 'Sin asignar' }}
+          </div>
         </div>
 
         <div class="form-group full-width">
@@ -78,6 +90,7 @@ defineExpose({ abrirModal })
           <v-text-field
             v-model.number="form.capacidad_carga"
             type="number"
+            :disabled="esSupervisor"
             placeholder="Ej: 50"
             variant="outlined"
             density="comfortable"
@@ -91,6 +104,7 @@ defineExpose({ abrirModal })
           <v-select
             v-model="form.unidad_medida"
             :items="unidadesMedida"
+            :disabled="esSupervisor"
             placeholder="Seleccionar Medida"
             variant="outlined"
             density="comfortable"
@@ -104,6 +118,7 @@ defineExpose({ abrirModal })
           <v-text-field
             v-model="form.placa"
             placeholder="Ej: TCV-7498"
+            :disabled="esSupervisor"
             variant="outlined"
             density="comfortable"
             hide-details="auto"

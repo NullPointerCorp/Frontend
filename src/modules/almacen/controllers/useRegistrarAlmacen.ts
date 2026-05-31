@@ -51,7 +51,7 @@ export const useRegistrarAlmacen = (onSuccess: (almacen: Almacen) => void) => {
     ciudadSeleccionada.value = null
   }
 
-  watch(ciudadSeleccionada, (nuevo, anterior) => {
+  watch(ciudadSeleccionada, (_, anterior) => {
     if (anterior !== null) {
       form.sucursal_id = null
     }

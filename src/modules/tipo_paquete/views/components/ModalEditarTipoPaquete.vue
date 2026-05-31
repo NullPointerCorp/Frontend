@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useEditarTipoPaquete } from '@/modules/tipo_paquete/controllers/useEditarTipoPaquete'
 import type { TipoPaquete } from '@/modules/tipo_paquete/interfaces/paquete-interface'
 
@@ -15,10 +15,6 @@ const {
   cerrarModal,
   editarTipoPaquete,
 } = useEditarTipoPaquete((tipo_paquete) => emit('paqueteEditado', tipo_paquete))
-
-const precioCalculado = computed(() =>
-  form.value.precio !== undefined ? form.value.precio : null
-)
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (!dialog.value) return

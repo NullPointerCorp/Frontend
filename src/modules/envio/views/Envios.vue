@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { onMounted, watch, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useEnvios } from "../controllers/useEnvios";
+import type { EnvioConsultaDTO } from "../interfaces/envio-interface";
 
 import ModalConfirmar from "@/components/ModalConfirmar.vue";
-
-import Tabla from "@/components/Tabla.vue";
+import ModalRegistrarEnvio from "./components/ModalRegistrarEnvio.vue";
+import ModalMotivoCancelacion from "./components/ModalMotivoCancelacion.vue";
+import ModalDetalleEnvio from "./components/ModalDetalleEnvio.vue";
 import AppHeader from "@/components/AppHeader.vue";
-
-const modalEditar = ref<any>(null);
 
 const {
   enviosPaginados,
@@ -22,7 +22,31 @@ const {
   aceptar,
   cancelar,
   mensajeConfirmar,
+  dialogMotivo,
+  motivo,
+  solicitarCancelacion,
+  confirmarCancelacion,
+  cancelarMotivo,
 } = useEnvios();
+
+const dialogDetalle = ref(false);
+const envioDetalle = ref<EnvioConsultaDTO | null>(null);
+
+const abrirDetalle = (envio: EnvioConsultaDTO) => {
+  envioDetalle.value = envio;
+  dialogDetalle.value = true;
+};
+
+const cerrarDetalle = () => {
+  dialogDetalle.value = false;
+  envioDetalle.value = null;
+};
+
+const puedeCancelarEnvio = (estado: string) => {
+  return ["registrado", "en_espera"].includes(
+    estado.trim().toLowerCase().replace(/\s+/g, "_"),
+  );
+};
 
 onMounted(fetchEnvios);
 watch(search, () => { page.value = 1; });
@@ -31,68 +55,181 @@ watch(search, () => { page.value = 1; });
 <template>
   <v-app>
     <v-main class="main-content">
-
-      <!-- Header -->
       <AppHeader />
 
       <div class="content-wrapper">
-
-        <!-- Page Header -->
         <div class="page-header">
           <div>
-            <h1 class="page-title">Envíos</h1>
-            <p class="page-subtitle">Gestione los envíos.</p>
+            <h1 class="page-title">Catálogo de Envíos</h1>
+            <p class="page-subtitle">Gestione el registro y cancelacion de envios.</p>
           </div>
-          <!-- <ModalRegistrarRol @rolCreado="agregarRol" />-->
+
+          <ModalRegistrarEnvio @envioCreado="fetchEnvios" />
         </div>
 
-        <!-- Filtros -->
         <div class="filters-row">
           <div class="search-wrapper">
-            <v-text-field v-model="search" placeholder="Filtrar por nombre, descripcion..."
-              prepend-inner-icon="mdi-filter-variant" variant="outlined" density="compact" hide-details clearable
-              class="search-field" />
+            <v-text-field
+              v-model="search"
+              placeholder="Filtrar por folio, correo, descripcion, origen o destino..."
+              prepend-inner-icon="mdi-filter-variant"
+              variant="outlined"
+              density="compact"
+              hide-details
+              clearable
+              class="search-field"
+            />
           </div>
           <div class="items-per-page">
             <span>Mostrar:</span>
-            <v-select v-model="limit" :items="[5, 10, 25, 50]" variant="outlined" density="compact" hide-details
-              class="items-select" />
+            <v-select
+              v-model="limit"
+              :items="[5, 10, 25, 50]"
+              variant="outlined"
+              density="compact"
+              hide-details
+              class="items-select"
+            />
           </div>
         </div>
 
-        <!-- Tabla -->
-        <Tabla item-key="rol_id" :headers="[
-          { title: 'ID', key: 'envio_id' },
-          { title: 'Correo de Cliente', key: 'correo' },
-          { title: 'Descripción', key: 'descripcion' },
-          { title: 'Tipo de Paquete', key: 'tamanio' },
-          { title: 'Forma', key: 'forma' },
-          { title: 'Peso', key: 'peso' },
-          { title: 'Empleado', key: 'nombre_empleado' },
-          { title: 'No. de Serie', key: 'numero_serie' },
-          { title: 'Transporte', key: 'nombre_subtipo' },
-          { title: 'Fecha de Salida', key: 'fecha_salida' },
-          { title: 'Fecha de Llegada', key: 'fecha_llegada' },
-          { title: 'Origen', key: 'origen' },
-          { title: 'Destino', key: 'destino' },
-          { title: 'Estado de envío', key: 'estado_envio' }
-        ]" :items="enviosPaginados" :loading="loading" :page="page" :limit="limit" :total-items="totalEnvios"
-          :total-paginas="totalPaginas"
-          @update:page="page = $event" />
+        <v-card class="table-card">
+          <div class="table-scroll">
+            <v-data-table
+              :headers="[
+                { title: 'Folio', key: 'envio_id' },
+                { title: 'Correo de Cliente', key: 'correo' },
+                { title: 'Tipo de Paquete', key: 'tamanio' },
+                { title: 'Transporte', key: 'nombre_subtipo' },
+                { title: 'Fecha de Salida', key: 'fecha_salida' },
+                { title: 'Destino', key: 'destino' },
+                { title: 'Estado', key: 'estado_envio' },
+                { title: 'Acciones', key: 'acciones', sortable: false },
+              ]"
+              :items="enviosPaginados"
+              :loading="loading"
+              hide-default-footer
+              :items-per-page="-1"
+            >
+              <template #no-data>
+                <div class="no-data">
+                  <v-icon size="48" color="on-surface">mdi-database-off-outline</v-icon>
+                  <p>No hay registros disponibles</p>
+                </div>
+              </template>
 
-        <!-- Footer -->
+              <template #item.estado_envio="{ item }">
+                <v-chip
+                  size="small"
+                  :color="item.estado_envio?.toLowerCase() === 'cancelado' ? 'error' : item.estado_envio?.toLowerCase() === 'en espera' ? 'warning' : 'primary'"
+                  variant="tonal"
+                >
+                  {{ item.estado_envio }}
+                </v-chip>
+              </template>
+
+              <template #item.nombre_subtipo="{ item }">
+                {{ item.nombre_subtipo || "Sin asignar" }}
+              </template>
+
+              <template #item.fecha_salida="{ item }">
+                {{ item.fecha_salida || "En espera" }}
+              </template>
+
+              <template #item.acciones="{ item }">
+                <div class="actions-cell">
+                  <v-btn
+                    icon
+                    variant="text"
+                    size="small"
+                    title="Ver detalles"
+                    @click="abrirDetalle(item)"
+                  >
+                    <v-icon size="18">mdi-eye-outline</v-icon>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    color="error"
+                    variant="text"
+                    size="small"
+                    title="Cancelar envio"
+                    :disabled="!puedeCancelarEnvio(item.estado_envio)"
+                    @click="solicitarCancelacion(item)"
+                  >
+                    <v-icon size="18">mdi-close-circle-outline</v-icon>
+                  </v-btn>
+                </div>
+              </template>
+            </v-data-table>
+          </div>
+
+          <div class="table-footer">
+            <span class="results-info">
+              Mostrando {{ Math.min((page - 1) * limit + 1, totalEnvios) }} a
+              {{ Math.min(page * limit, totalEnvios) }} de
+              {{ totalEnvios.toLocaleString() }} resultados
+            </span>
+            <v-pagination
+              :model-value="page"
+              :length="totalPaginas"
+              :total-visible="5"
+              density="compact"
+              @update:model-value="page = $event"
+            />
+          </div>
+        </v-card>
+
         <div class="page-footer">
           <span>© 2026 NovaCode.</span>
         </div>
-
       </div>
 
-      <!-- Modales -->
-      <ModalConfirmar :dialog="dialogConfirmar" :mensaje="mensajeConfirmar" @aceptar="aceptar" @cancelar="cancelar" />
-      <!--<ModalEditarRol ref="modalEditar" @rolEditado="actualizarRol" />-->
+      <ModalConfirmar
+        :dialog="dialogConfirmar"
+        :mensaje="mensajeConfirmar"
+        @aceptar="aceptar"
+        @cancelar="cancelar"
+      />
 
+      <ModalMotivoCancelacion
+        :dialog="dialogMotivo"
+        :motivo="motivo"
+        @update:motivo="motivo = $event"
+        @aceptar="confirmarCancelacion"
+        @cancelar="cancelarMotivo"
+      />
+
+      <ModalDetalleEnvio
+        :dialog="dialogDetalle"
+        :envio="envioDetalle"
+        @cerrar="cerrarDetalle"
+      />
     </v-main>
   </v-app>
 </template>
 
 <style src="@/assets/styles/catalogo.style.css"></style>
+
+<style scoped>
+.table-scroll {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.table-scroll :deep(thead) {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: rgb(var(--v-theme-surface));
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+  font-size: 0.9rem;
+}
+</style>

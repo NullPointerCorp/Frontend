@@ -13,8 +13,7 @@ import Almacenes from "@/modules/almacen/views/Almacen.vue";
 import empleados from "@/modules/empleado/views/Empleados.vue"
 import Roles from "@/modules/rol/views/Roles.vue";
 import Envios from "@/modules/envio/views/Envios.vue";
-import RegistrarEnvio from "@/modules/envio/views/RegistrarEnvio.vue";
-import CancelarEnvio from "@/modules/envio/views/CancelarEnvio.vue";
+import Viajes from "@/modules/viajes/views/Viajes.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -34,11 +33,12 @@ const routes = [
       { path: "roles", component: Roles },
       {path: "empleados", component: empleados},
       { path: "transporte", component: Transportes },
+      { path: "viajes", component: Viajes },
       { path: "clientes", component: Clientes },
       { path: "tipos-paquete", component: TiposPaquetes },
       { path: "envios", component: Envios },
-      { path: "registrar-envio", component: RegistrarEnvio },
-      { path: "cancelar-envio", component: CancelarEnvio },
+      { path: "registrar-envio", redirect: "/envios" },
+      { path: "cancelar-envio", redirect: "/envios" },
 
     ]
   }

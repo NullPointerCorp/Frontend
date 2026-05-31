@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   headers: { title: string; key: string; sortable?: boolean }[]
   items: any[]
   loading: boolean
@@ -16,9 +16,6 @@ const emit = defineEmits<{
   'update:page': [page: number]
 }>()
 
-const getItemId = (item: any): number => {
-  return item[props.itemKey ?? 'id']
-}
 </script>
 
 <template>
@@ -40,12 +37,14 @@ const getItemId = (item: any): number => {
 
         <template #item.acciones="{ item }">
           <div class="actions-cell">
-            <v-btn icon variant="text" size="small" @click="emit('editar', item)">
-              <v-icon size="18">mdi-pencil-outline</v-icon>
-            </v-btn>
-            <v-btn icon variant="text" size="small" @click="emit('eliminar', item)">
-              <v-icon size="18">mdi-trash-can-outline</v-icon>
-            </v-btn>
+            <slot name="acciones" :item="item">
+              <v-btn icon variant="text" size="small" @click="emit('editar', item)">
+                <v-icon size="18">mdi-pencil-outline</v-icon>
+              </v-btn>
+              <v-btn icon variant="text" size="small" @click="emit('eliminar', item)">
+                <v-icon size="18">mdi-trash-can-outline</v-icon>
+              </v-btn>
+            </slot>
           </div>
         </template>
       </v-data-table>

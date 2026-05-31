@@ -3,7 +3,6 @@ import type { CrearEnvio } from "../interfaces/envio-interface";
 import tiposPaquetesAPI from "@/modules/tipo_paquete/api/tipo_paqueteAPI";
 import sucursalAPI from "@/modules/sucursal/api/sucursalAPI";
 import envioAPI from "../api/envioAPI";
-import transporteAPI from "@/modules/transporte/api/transporteAPI";
 import clienteAPI from "@/modules/cliente/api/clienteAPI";
 import { useToast } from "@/composables/useToast";
 import ubicacionAPI from "@/modules/envio/api/ubicacionAPI";
@@ -19,11 +18,8 @@ export const useRegistrarEnvio = (onEnvioCreado: (envio: any) => void) => {
 
   const tiposPaquete = ref<any[]>([]);
   const tiposTransporte = ref<any[]>([]);
-  const todosLosSubtipos = ref<any[]>([]);
   const subtiposFiltrados = ref<any[]>([]);
-  const todosLosTransportes = ref<any[]>([]);
   const transportes = ref<any[]>([]);
-
   const estados = ref<any[]>([]);
   const ciudadesDestino = ref<any[]>([]);
   const sucursalesDestino = ref<any[]>([]);
@@ -34,32 +30,56 @@ export const useRegistrarEnvio = (onEnvioCreado: (envio: any) => void) => {
   const loadingCiudades = ref(false);
   const loadingSucursales = ref(false);
   const loadingTransportes = ref(false);
-
-  const hoy = () => new Date().toISOString().slice(0, 10);
-
+  const tipoTransporteSeleccionado = ref<number | null>(null);
+  const subtipoSeleccionado = ref<number | null>(null);
   const form = ref<CrearEnvio>({
     correo: "",
     tipo_paquete_id: null,
     forma_paquete: "",
     numero_serie: "",
     descripcion: "",
-    fecha_salida: hoy(),
-    fecha_llegada: "",
     estado_envio: "",
     peso: 0,
-    origen_id: null,
     destino_id: null,
     cliente_id: null,
   });
 
   const erroresForm = ref<Record<string, string>>({});
 
-  watch(() => form.value.tipo_paquete_id, () => { delete erroresForm.value.tipo_paquete_id; });
-  watch(() => form.value.destino_id,      () => { delete erroresForm.value.destino_id; });
-  watch(() => form.value.numero_serie,    () => { delete erroresForm.value.numero_serie; });
-  watch(() => form.value.peso,            () => { delete erroresForm.value.peso; });
-  watch(() => form.value.descripcion,     () => { delete erroresForm.value.descripcion; });
-  watch(correoCliente,                    () => { delete erroresForm.value.correo; });
+  watch(
+    () => form.value.tipo_paquete_id,
+    () => {
+      delete erroresForm.value.tipo_paquete_id;
+    },
+  );
+  watch(
+    () => form.value.destino_id,
+    () => {
+      delete erroresForm.value.destino_id;
+    },
+  );
+  watch(
+    () => form.value.peso,
+    () => {
+      delete erroresForm.value.peso;
+    },
+  );
+  watch(
+    () => form.value.descripcion,
+    () => {
+      delete erroresForm.value.descripcion;
+    },
+  );
+  watch(correoCliente, (correo) => {
+    delete erroresForm.value.correo;
+
+    if (!correo) {
+      clienteEncontrado.value = null;
+      errorCliente.value = "";
+      form.value.cliente_id = null;
+      form.value.correo = "";
+    }
+  });
 
   const buscarCliente = async () => {
     if (!correoCliente.value) return;
@@ -80,23 +100,18 @@ export const useRegistrarEnvio = (onEnvioCreado: (envio: any) => void) => {
 
   const fetchCatalogos = async () => {
     loadingEstados.value = true;
-    loadingTransportes.value = true;
     try {
-      const [tiposPaqRes, estadosRes, tiposTranRes, subtiposRes, transportesRes] = await Promise.all([
+      const [
+        tiposPaqRes,
+        estadosRes,
+      ] = await Promise.all([
         tiposPaquetesAPI.get("/"),
         ubicacionAPI.get("/estados"),
-        transporteAPI.get("/tipos"),
-        transporteAPI.get("/subtipos"),
-        transporteAPI.get("/"),
       ]);
       tiposPaquete.value = tiposPaqRes.data;
       estados.value = estadosRes.data;
-      tiposTransporte.value = tiposTranRes.data;
-      todosLosSubtipos.value = subtiposRes.data;
-      todosLosTransportes.value = transportesRes.data;
     } finally {
       loadingEstados.value = false;
-      loadingTransportes.value = false;
     }
   };
 
@@ -128,33 +143,13 @@ export const useRegistrarEnvio = (onEnvioCreado: (envio: any) => void) => {
     }
   });
 
-  const tipoTransporteSeleccionado = ref<number | null>(null);
-  const subtipoSeleccionado = ref<number | null>(null);
-
-  watch(tipoTransporteSeleccionado, (val) => {
-    subtipoSeleccionado.value = null;
-    subtiposFiltrados.value = [];
-    transportes.value = [];
-    form.value.numero_serie = "";
-    if (!val) return;
-    subtiposFiltrados.value = todosLosSubtipos.value.filter((s) => s.tipo_id === val);
-  });
-
-  watch(subtipoSeleccionado, (val) => {
-    transportes.value = [];
-    form.value.numero_serie = "";
-    if (!val) return;
-    transportes.value = todosLosTransportes.value.filter((t) => t.subtipo_id === val);
-  });
-
   const validar = () => {
     const e: Record<string, string> = {};
-    if (!form.value.cliente_id)      e.correo          = "Busca y selecciona un cliente";
+    if (!form.value.cliente_id) e.correo = "Busca y selecciona un cliente";
     if (!form.value.tipo_paquete_id) e.tipo_paquete_id = "Requerido";
-    if (!form.value.descripcion)     e.descripcion     = "Requerido";
-    if (!form.value.destino_id)      e.destino_id      = "Requerido";
-    if (!form.value.numero_serie)    e.numero_serie    = "Requerido";
-    if (!form.value.peso)            e.peso            = "Requerido";
+    if (!form.value.descripcion) e.descripcion = "Requerido";
+    if (!form.value.destino_id) e.destino_id = "Requerido";
+    if (!form.value.peso) e.peso = "Requerido";
     erroresForm.value = e;
     return Object.keys(e).length === 0;
   };
@@ -176,28 +171,50 @@ export const useRegistrarEnvio = (onEnvioCreado: (envio: any) => void) => {
 
   const resetForm = () => {
     form.value = {
-      correo: "", tipo_paquete_id: null, forma_paquete: "", numero_serie: "", descripcion: "",
-      fecha_salida: "", fecha_llegada: "", estado_envio: "",
-      peso: 0, origen_id: null, destino_id: null, cliente_id: null,
+      correo: "",
+      tipo_paquete_id: null,
+      forma_paquete: "",
+      numero_serie: "",
+      descripcion: "",
+      estado_envio: "",
+      peso: 0,
+      destino_id: null,
+      cliente_id: null,
     };
     correoCliente.value = "";
     clienteEncontrado.value = null;
     errorCliente.value = "";
     estadoDestino.value = null;
     ciudadDestino.value = null;
-    tipoTransporteSeleccionado.value = null;
-    subtipoSeleccionado.value = null;
     erroresForm.value = {};
   };
 
   return {
-    form, erroresForm, loading,
-    correoCliente, clienteEncontrado, loadingCliente, errorCliente, buscarCliente,
-    tiposPaquete, tiposTransporte, subtiposFiltrados, transportes,
-    estados, ciudadesDestino, sucursalesDestino,
-    estadoDestino, ciudadDestino,
-    tipoTransporteSeleccionado, subtipoSeleccionado,
-    loadingEstados, loadingCiudades, loadingSucursales, loadingTransportes,
-    fetchCatalogos, registrarEnvio, resetForm,
+    form,
+    erroresForm,
+    loading,
+    correoCliente,
+    clienteEncontrado,
+    loadingCliente,
+    errorCliente,
+    buscarCliente,
+    tiposPaquete,
+    tiposTransporte,
+    subtiposFiltrados,
+    transportes,
+    estados,
+    ciudadesDestino,
+    sucursalesDestino,
+    estadoDestino,
+    ciudadDestino,
+    tipoTransporteSeleccionado,
+    subtipoSeleccionado,
+    loadingEstados,
+    loadingCiudades,
+    loadingSucursales,
+    loadingTransportes,
+    fetchCatalogos,
+    registrarEnvio,
+    resetForm,
   };
 };

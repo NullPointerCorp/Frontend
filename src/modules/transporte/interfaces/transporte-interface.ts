@@ -1,6 +1,7 @@
 export interface Transporte {
   numero_serie: string;
-  empleado_id: number;
+  sucursal_id: number;
+  empleado_id: number | null;
   transportista: string;
   tipo_id: number;
   tipo_transporte: string;
@@ -13,7 +14,8 @@ export interface Transporte {
 
 export interface CrearTransporteDTO {
   numero_serie: string;
-  empleado_id: number;
+  sucursal_id: number;
+  empleado_id?: number | null;
   subtipo_id: number;
   capacidad_carga: number;
   unidad_medida: string;

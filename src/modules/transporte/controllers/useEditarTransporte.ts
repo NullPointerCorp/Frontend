@@ -1,9 +1,10 @@
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { actualizarTransporteSchema } from '@/modules/transporte/schemas/TransporteSchema'
 import { useToast } from '@/composables/useToast'
 import type { Transporte } from '@/modules/transporte/interfaces/transporte-interface'
 import transporteAPI from '../api/transporteAPI'
 import empleadoAPI from '@/modules/empleado/api/empleadoAPI'
+import { useAuthStore } from '@/modules/auth/store/auth.store'
 
 export interface Transportista {
   empleado_id: number
@@ -21,6 +22,10 @@ interface FormEditarTransporte {
 
 export const useEditarTransporte = (onSuccess: (transporte: Transporte) => void) => {
   const { showToast } = useToast()
+  const authStore = useAuthStore()
+  const esSupervisor = computed(
+    () => authStore.session?.rol?.toLowerCase() === 'supervisor'
+  )
 
   const dialog = ref(false)
   const loading = ref(false)
@@ -31,9 +36,14 @@ export const useEditarTransporte = (onSuccess: (transporte: Transporte) => void)
   const loadingTransportistas = ref(false)
 
   const fetchTransportistas = async () => {
+    if (!esSupervisor.value) {
+      transportistas.value = []
+      return
+    }
+
     loadingTransportistas.value = true
     try {
-      const { data } = await empleadoAPI.get('/transportistas')
+      const { data } = await empleadoAPI.get('/transportistas/sucursal-actual')
       transportistas.value = Array.isArray(data) ? data : (data?.data ?? [])
     } catch {
       transportistas.value = []
@@ -100,7 +110,6 @@ export const useEditarTransporte = (onSuccess: (transporte: Transporte) => void)
     }
 
     return {
-      empleado_id: resultado.data.empleado_id,
       capacidad_carga: resultado.data.capacidad_carga,
       unidad_medida: resultado.data.unidad_medida,
       placa: resultado.data.placa || undefined,
@@ -118,7 +127,10 @@ export const useEditarTransporte = (onSuccess: (transporte: Transporte) => void)
   const editarTransporte = async (): Promise<void> => {
     if (!transporteSeleccionado.value) return
 
-    const datos = validarFormulario()
+    const datos = esSupervisor.value
+      ? { empleado_id: form.value.empleado_id ?? null }
+      : validarFormulario()
+
     if (!datos) {
       showToast('Por favor corrige los errores del formulario', 'warning')
       return
@@ -148,6 +160,7 @@ export const useEditarTransporte = (onSuccess: (transporte: Transporte) => void)
     transporteSeleccionado,
     transportistas,
     loadingTransportistas,
+    esSupervisor,
     abrirModal,
     cerrarModal,
     editarTransporte,

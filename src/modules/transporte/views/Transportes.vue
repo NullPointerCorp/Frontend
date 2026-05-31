@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, watch, ref } from 'vue'
+import { computed, onMounted, watch, ref } from 'vue'
 import { useTransporte } from '@/modules/transporte/controllers/useTransporte'
+import { useAuthStore } from '@/modules/auth/store/auth.store'
 
 import ModalRegistrarTransporte from './components/ModalRegistrarTransporte.vue'
 import ModalEditarTransporte from './components/ModalEditarTransporte.vue'
@@ -10,6 +11,10 @@ import Tabla from '@/components/Tabla.vue'
 import AppHeader from '@/components/AppHeader.vue'
 
 const modalEditar = ref<any>(null)
+const authStore = useAuthStore()
+const esAdministrador = computed(
+  () => authStore.session?.rol?.toLowerCase() === 'administrador'
+)
 
 const {
   transportesPaginados,
@@ -48,7 +53,10 @@ watch(search, () => { page.value = 1 })
             <h1 class="page-title">Catálogo de Transporte</h1>
             <p class="page-subtitle">Gestión y monitoreo de la flota de vehículos de la red logística.</p>
           </div>
-          <ModalRegistrarTransporte @transporteCreado="agregarTransporte" />
+          <ModalRegistrarTransporte
+            v-if="esAdministrador"
+            @transporteCreado="agregarTransporte"
+          />
         </div>
 
         <!-- Filtros -->
@@ -100,7 +108,22 @@ watch(search, () => { page.value = 1 })
           @editar="modalEditar?.abrirModal($event)"
           @eliminar="eliminarTransporte"
           @update:page="page = $event"
-        />
+        >
+          <template #acciones="{ item }">
+            <v-btn icon variant="text" size="small" @click="modalEditar?.abrirModal(item)">
+              <v-icon size="18">mdi-pencil-outline</v-icon>
+            </v-btn>
+            <v-btn
+              v-if="esAdministrador"
+              icon
+              variant="text"
+              size="small"
+              @click="eliminarTransporte(item)"
+            >
+              <v-icon size="18">mdi-trash-can-outline</v-icon>
+            </v-btn>
+          </template>
+        </Tabla>
 
         <!-- Footer -->
         <div class="page-footer">

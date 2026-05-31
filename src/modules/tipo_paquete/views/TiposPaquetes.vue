@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from "vue";
 import { useTipoPaquete } from "../controllers/useTipoPaquetes";
-import { useAuthStore } from "@/modules/auth/store/auth.store";
 
 import ModalRegistrarPaquete from "./components/ModalRegistrarTipoPaquete.vue";
 import ModalEditarPaquete from "./components/ModalEditarTipoPaquete.vue";
@@ -9,7 +8,6 @@ import ModalConfirmar from "@/components/ModalConfirmar.vue";
 import Tabla from "@/components/Tabla.vue";
 import AppHeader from "@/components/AppHeader.vue";
 
-const authStore = useAuthStore();
 const modalEditar = ref<any>(null);
 
 const {

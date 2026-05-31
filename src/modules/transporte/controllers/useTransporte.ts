@@ -3,6 +3,7 @@ import type { Transporte } from '@/modules/transporte/interfaces/transporte-inte
 import { useConfirmar } from '@/composables/useConfirmar'
 import { useToast } from '@/composables/useToast'
 import transporteAPI from '../api/transporteAPI'
+import { useAuthStore } from "@/modules/auth/store/auth.store";
 
 const todosLosTransportes = ref<Transporte[]>([])
 const search = ref('')
@@ -12,6 +13,7 @@ const loading = ref(false)
 
 export const useTransporte = () => {
   const { showToast } = useToast() 
+  const authStore = useAuthStore();
 
   const { dialog: dialogConfirmar, mensaje: mensajeConfirmar, confirmar, aceptar, cancelar } = useConfirmar()
 
@@ -35,9 +37,20 @@ export const useTransporte = () => {
   })
 
   const fetchTransportes = async () => {
-    loading.value = true
+    const empleado_id = authStore.session?.id;
+    const empleado_rol = authStore.session?.rol?.toLowerCase();
+
+    if (!empleado_id) {
+      todosLosTransportes.value = [];
+      return;
+    }
+
+    loading.value = true;
+
     try {
-      const response = await transporteAPI.get<Transporte[]>('/')
+      const endpoint =
+        empleado_rol === "administrador" ? "/" : `/empleado/${empleado_id}`;
+      const response = await transporteAPI.get<Transporte[]>(endpoint)
       const data = response.data
       todosLosTransportes.value = Array.isArray(data) ? data : ((data as any)?.data ?? [])
     } catch {

@@ -87,6 +87,7 @@ export const useClientes = () => {
   };
 
   return {
+    clientes: todosLosClientes,
     clientesPaginados,
     totalPaginas,
     totalClientes,

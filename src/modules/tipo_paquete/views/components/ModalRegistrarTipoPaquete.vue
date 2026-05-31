@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useRegistrarTipoPaquete } from '@/modules/tipo_paquete/controllers/useRegistrarTipoPaquete'
 import type { TipoPaquete } from '@/modules/tipo_paquete/interfaces/paquete-interface'
 

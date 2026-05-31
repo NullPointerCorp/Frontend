@@ -12,10 +12,10 @@ const {
   erroresForm,
   tipos,
   subtiposFiltrados,
-  transportistas,
+  sucursales,
   loadingTipos,
   loadingSubtipos,
-  loadingTransportistas,
+  loadingSucursales,
   abrirModal,
   cerrarModal,
   registrarTransporte,
@@ -97,18 +97,18 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Transportista <span class="required">*</span></label>
+            <label class="form-label">Sucursal <span class="required">*</span></label>
             <v-select
-              v-model="form.empleado_id"
-              :items="transportistas"
-              :item-title="(t) => `${t.nombre} ${t.apellido_paterno}`"
-              item-value="empleado_id"
-              placeholder="Seleccionar Transportista"
+              v-model="form.sucursal_id"
+              :items="sucursales"
+              item-title="nombre_sucursal"
+              item-value="sucursal_id"
+              placeholder="Seleccionar Sucursal"
               variant="outlined"
               density="comfortable"
               hide-details="auto"
-              :loading="loadingTransportistas"
-              :error-messages="erroresForm.empleado_id"
+              :loading="loadingSucursales"
+              :error-messages="erroresForm.sucursal_id"
             />
           </div>
           <div class="form-group">
