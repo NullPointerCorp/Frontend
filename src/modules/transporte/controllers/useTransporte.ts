@@ -49,7 +49,7 @@ export const useTransporte = () => {
 
     try {
       const endpoint =
-        empleado_rol === "administrador" ? "/" : `/empleado/${empleado_id}`;
+        empleado_rol === "jefe" ? "/" : `/empleado/${empleado_id}`;
       const response = await transporteAPI.get<Transporte[]>(endpoint)
       const data = response.data
       todosLosTransportes.value = Array.isArray(data) ? data : ((data as any)?.data ?? [])

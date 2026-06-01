@@ -74,7 +74,7 @@ watch(search, () => { page.value = 1; });
         ]" :items="rolesPaginados" :loading="loading" :page="page" :limit="limit" :total-items="totalRoles"
           :total-paginas="totalPaginas" @update:page="page = $event">
           <template #acciones="{ item }">
-            <template v-if="item.rol_nombre?.toLowerCase() !== 'administrador'">
+            <template v-if="item.rol_nombre?.toLowerCase() !== 'jefe'">
               <v-btn icon variant="text" size="small" @click="modalEditar?.abrirModal(item)">
                 <v-icon size="18">mdi-pencil-outline</v-icon>
               </v-btn>

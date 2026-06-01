@@ -74,7 +74,7 @@ export const useEnvios = () => {
 
     try {
       const endpoint =
-        empleado_rol === "administrador" ? "/" : `/empleado/${empleado_id}`;
+        empleado_rol === "jefe" ? "/" : `/empleado/${empleado_id}`;
 
       const { data } = await envioAPI.get<EnvioConsultaDTO[]>(endpoint);
 
