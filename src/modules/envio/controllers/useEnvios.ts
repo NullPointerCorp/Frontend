@@ -73,8 +73,11 @@ export const useEnvios = () => {
     loading.value = true;
 
     try {
+      const sucursal_id = authStore.session?.sucursal_id;
       const endpoint =
-        empleado_rol?.toLowerCase() === "jefe" ? "/" : `/empleado/${empleado_id}`;
+        empleado_rol?.toLowerCase() === "jefe" ? "/" :
+        empleado_rol?.toLowerCase() === "supervisor" ? `/sucursal/${sucursal_id}` :
+        `/empleado/${empleado_id}`;
 
       const { data } = await envioAPI.get<EnvioConsultaDTO[]>(endpoint);
 
