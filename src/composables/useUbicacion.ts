@@ -1,9 +1,9 @@
 import { ref, watch } from 'vue'
 import { createAPI } from '@/api/base.api'
 
-const ubicacionAPI = createAPI('http://localhost:3000/ubicacion')
-const empleadoAPI = createAPI('http://localhost:3000/empleados')
-const sucursalAPI = createAPI('http://localhost:3000/sucursales')
+const ubicacionAPI = createAPI('/ubicacion')
+const empleadoAPI = createAPI('/empleados')
+const sucursalAPI = createAPI('/sucursales')
 
 export interface Estado {
   estado_id: number
