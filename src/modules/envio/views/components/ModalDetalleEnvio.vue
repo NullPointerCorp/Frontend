@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import type { EnvioConsultaDTO } from "../../interfaces/envio-interface";
+import { estadoEnvioConfig } from "../../interfaces/envio-interface";
+
+const estadoEnvio = (estado: string) => {
+  const key = estado.trim().toLowerCase().replace(/\s+/g, '_') as keyof typeof estadoEnvioConfig
+  return estadoEnvioConfig[key] ?? { color: 'primary', label: estado }
+}
 
 defineProps<{
   dialog: boolean;
@@ -40,10 +46,10 @@ defineEmits<{
               <span class="detail-label">Estado del envio</span>
               <v-chip
                 size="small"
-                :color="envio.estado_envio?.toLowerCase() === 'cancelado' ? 'error' : 'primary'"
+                :color="estadoEnvio(envio.estado_envio).color"
                 variant="tonal"
               >
-                {{ envio.estado_envio }}
+                {{ estadoEnvio(envio.estado_envio).label }}
               </v-chip>
             </div>
           </div>
@@ -70,6 +76,10 @@ defineEmits<{
             <div>
               <span class="detail-label">Peso</span>
               <strong>{{ envio.peso }} kg</strong>
+            </div>
+            <div>
+              <span class="detail-label">Precio</span>
+              <strong>${{ Number(envio.precio).toFixed(2) }}</strong>
             </div>
           </div>
         </section>
@@ -107,7 +117,7 @@ defineEmits<{
         <section class="detail-section">
           <h2 class="detail-title">
             <v-icon size="18">mdi-map-marker-path</v-icon>
-            Ruta
+            Viaje
           </h2>
           <div class="detail-grid">
             <div>

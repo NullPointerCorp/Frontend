@@ -1,3 +1,13 @@
+export type EstadoEnvio = 'en_espera' | 'registrado' | 'en_camino' | 'entregado' | 'cancelado'
+
+export const estadoEnvioConfig: Record<EstadoEnvio, { color: string; label: string }> = {
+  en_espera:  { color: 'warning',  label: 'En Espera'  },
+  registrado: { color: 'primary',  label: 'Registrado' },
+  en_camino:  { color: 'primary',  label: 'En Camino'  },
+  entregado:  { color: 'primary',  label: 'Entregado'  },
+  cancelado:  { color: 'error',    label: 'Cancelado'  },
+}
+
 export interface CrearEnvio {
   correo: string;
   tipo_paquete_id: number | null;
@@ -16,6 +26,7 @@ export interface EnvioConsultaDTO {
   descripcion: string;
   tamanio: string;
   forma: string;
+  precio: number;
   peso: number;
   nombre_empleado: string; 
   numero_serie: string | null;

@@ -72,8 +72,18 @@ watch(search, () => { page.value = 1; });
           { title: 'Descripción', key: 'descripcion' },
           { title: 'Acciones', key: 'acciones', sortable: false }
         ]" :items="rolesPaginados" :loading="loading" :page="page" :limit="limit" :total-items="totalRoles"
-          :total-paginas="totalPaginas" @editar="modalEditar?.abrirModal($event)" @eliminar="eliminarRol"
-          @update:page="page = $event" />
+          :total-paginas="totalPaginas" @update:page="page = $event">
+          <template #acciones="{ item }">
+            <template v-if="item.rol_nombre?.toLowerCase() !== 'administrador'">
+              <v-btn icon variant="text" size="small" @click="modalEditar?.abrirModal(item)">
+                <v-icon size="18">mdi-pencil-outline</v-icon>
+              </v-btn>
+              <v-btn icon variant="text" size="small" @click="eliminarRol(item)">
+                <v-icon size="18">mdi-trash-can-outline</v-icon>
+              </v-btn>
+            </template>
+          </template>
+        </Tabla>
         
         <!-- Footer -->
         <div class="page-footer">

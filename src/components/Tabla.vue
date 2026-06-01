@@ -28,6 +28,10 @@ const emit = defineEmits<{
         hide-default-footer
         :items-per-page="-1"
       >
+        <template v-for="(_, name) in $slots" :key="String(name)" #[name]="slotData">
+          <slot :name="name" v-bind="slotData ?? {}" />
+        </template>
+
         <template #no-data>
           <div class="no-data">
             <v-icon size="48" color="on-surface">mdi-database-off-outline</v-icon>
@@ -37,14 +41,17 @@ const emit = defineEmits<{
 
         <template #item.acciones="{ item }">
           <div class="actions-cell">
-            <slot name="acciones" :item="item">
+            <template v-if="$slots['acciones']">
+              <slot name="acciones" :item="item" />
+            </template>
+            <template v-else>
               <v-btn icon variant="text" size="small" @click="emit('editar', item)">
                 <v-icon size="18">mdi-pencil-outline</v-icon>
               </v-btn>
               <v-btn icon variant="text" size="small" @click="emit('eliminar', item)">
                 <v-icon size="18">mdi-trash-can-outline</v-icon>
               </v-btn>
-            </slot>
+            </template>
           </div>
         </template>
       </v-data-table>

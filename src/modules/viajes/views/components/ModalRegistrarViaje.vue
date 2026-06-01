@@ -9,8 +9,10 @@ const {
   dialog,
   loading,
   loadingCatalogos,
+  loadingTransportes,
   erroresForm,
   catalogos,
+  transportes,
   estados,
   ciudades,
   sucursalesDestino,
@@ -70,20 +72,47 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
           </div>
         </div>
 
-        <div class="form-group full-width">
-            <label class="form-label">Transporte <span class="required">*</span></label>
-            <v-select
-              v-model="form.numero_serie"
-              :items="catalogos?.transportes ?? []"
-              :item-title="nombreTransporte"
-              item-value="numero_serie"
-              placeholder="Seleccionar transporte"
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Fecha de salida <span class="required">*</span></label>
+            <v-text-field
+              v-model="form.fecha_salida"
+              type="datetime-local"
               variant="outlined"
               density="comfortable"
               hide-details="auto"
-              :loading="loadingCatalogos"
-              :error-messages="erroresForm.numero_serie"
+              :error-messages="erroresForm.fecha_salida"
             />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Fecha de llegada <span class="required">*</span></label>
+            <v-text-field
+              v-model="form.fecha_llegada"
+              type="datetime-local"
+              variant="outlined"
+              density="comfortable"
+              hide-details="auto"
+              :error-messages="erroresForm.fecha_llegada"
+            />
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label class="form-label">Transporte <span class="required">*</span></label>
+          <v-select
+            v-model="form.numero_serie"
+            :items="transportes"
+            :item-title="nombreTransporte"
+            item-value="numero_serie"
+            :placeholder="!form.fecha_salida || !form.fecha_llegada ? 'Selecciona las fechas primero' : 'Seleccionar transporte'"
+            variant="outlined"
+            density="comfortable"
+            hide-details="auto"
+            :loading="loadingTransportes"
+            :disabled="!form.fecha_salida || !form.fecha_llegada"
+            :error-messages="erroresForm.numero_serie"
+          />
         </div>
 
         <div class="form-section-title">
@@ -141,31 +170,6 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
             :disabled="!ciudadDestino"
             :error-messages="erroresForm.sucursal_destino_id"
           />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Fecha de salida <span class="required">*</span></label>
-            <v-text-field
-              v-model="form.fecha_salida"
-              type="datetime-local"
-              variant="outlined"
-              density="comfortable"
-              hide-details="auto"
-              :error-messages="erroresForm.fecha_salida"
-            />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Fecha de llegada</label>
-            <v-text-field
-              v-model="form.fecha_llegada"
-              type="datetime-local"
-              variant="outlined"
-              density="comfortable"
-              hide-details="auto"
-            />
-          </div>
         </div>
 
         <div class="modal-actions">

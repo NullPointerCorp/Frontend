@@ -1,4 +1,5 @@
 export type TipoFiltroViaje = 'salidas' | 'entradas' | 'todos'
+export type EstadoViaje = 'programado' | 'en_camino' | 'entregado' | 'regresando' | 'finalizado' | 'cancelado'
 
 export interface Viaje {
   viaje_id: number
@@ -10,14 +11,21 @@ export interface Viaje {
   sucursal_destino_id: number
   destino: string
   fecha_salida: string
-  fecha_llegada: string | null
+  fecha_llegada: string
+  estado: EstadoViaje
 }
 
 export interface CrearViajeDTO {
   numero_serie: string
   sucursal_destino_id: number | null
   fecha_salida: string
-  fecha_llegada: string | null
+  fecha_llegada: string
+}
+
+export interface EditarViajeDTO {
+  numero_serie: string
+  fecha_salida: string
+  fecha_llegada: string
 }
 
 export interface ViajeCatalogos {
