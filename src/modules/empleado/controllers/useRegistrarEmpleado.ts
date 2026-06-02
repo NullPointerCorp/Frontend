@@ -1,10 +1,11 @@
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, computed, watch } from 'vue'
 import { empleadoSchema } from '@/modules/empleado/schemas/EmpleadoSchema'
 import type { Empleado, CrearEmpleadoDTO } from '@/modules/empleado/interfaces/empleado-interface'
 import type { Rol } from '@/modules/rol/interfaces/rol-interface'
 import type { SucursalOpcion } from '@/composables/useUbicacion'
 import { useToast } from '@/composables/useToast'
 import { useUbicacion } from '@/composables/useUbicacion'
+import { useAuthStore } from '@/modules/auth/store/auth.store'
 import empleadoAPI from '../api/empleadoAPI'
 import rolAPI from '@/modules/rol/api/rolAPI'
 import sucursalAPI from '@/modules/sucursal/api/sucursalAPI'
@@ -47,6 +48,9 @@ const formInicial = (): FormRegistrarEmpleado => ({
 
 export const useRegistrarEmpleado = (onSuccess: (empleado: Empleado) => void) => {
   const { showToast } = useToast()
+  const authStore = useAuthStore()
+
+  const esSupervisor = computed(() => authStore.session?.rol?.toLowerCase() === 'supervisor')
 
   const {
     estados,
@@ -105,8 +109,25 @@ export const useRegistrarEmpleado = (onSuccess: (empleado: Empleado) => void) =>
       sucursalAPI.get<SucursalOpcion[]>('/').then(({ data }) => (Array.isArray(data) ? data : [])),
       fetchEstados(),
     ])
-    roles.value = rolesData
+    roles.value = esSupervisor.value
+      ? rolesData.filter((r) => r.rol_nombre?.toLowerCase() !== 'supervisor')
+      : rolesData
     sucursales.value = sucursalesData
+  }
+
+  const resolverSucursalSupervisor = async (): Promise<number | null> => {
+    if (authStore.session?.sucursal_id) return authStore.session.sucursal_id
+    if (!authStore.session?.id) return null
+    try {
+      const { data } = await empleadoAPI.get<{ sucursal_id: number | null }>(`/${authStore.session.id}`)
+      const sucursalId = data.sucursal_id ?? null
+      if (sucursalId && authStore.session) {
+        authStore.setSession({ ...authStore.session, sucursal_id: sucursalId })
+      }
+      return sucursalId
+    } catch {
+      return null
+    }
   }
 
   const abrirModal = async () => {
@@ -115,6 +136,13 @@ export const useRegistrarEmpleado = (onSuccess: (empleado: Empleado) => void) =>
     resetUbicacion()
     dialog.value = true
     await fetchCatalogos()
+    if (esSupervisor.value) {
+      const sucursalId = await resolverSucursalSupervisor()
+      if (sucursalId) {
+        form.sucursal_id = sucursalId
+        sucursales.value = sucursales.value.filter((s) => s.sucursal_id === sucursalId)
+      }
+    }
   }
 
   const cerrarModal = () => {
@@ -203,6 +231,7 @@ export const useRegistrarEmpleado = (onSuccess: (empleado: Empleado) => void) =>
     loadingEstados,
     loadingCiudades,
     estadoSeleccionado,
+    esSupervisor,
     abrirModal,
     cerrarModal,
     registrarEmpleado,

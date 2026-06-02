@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import AppHeader from '@/components/AppHeader.vue'
 import Tabla from '@/components/Tabla.vue'
 import ModalRegistrarViaje from './components/ModalRegistrarViaje.vue'
+import ModalEditarViaje from './components/ModalEditarViaje.vue'
+import ModalConfirmar from '@/components/ModalConfirmar.vue'
 import { useViajes } from '../controllers/useViajes'
+import type { EstadoViaje } from '../interfaces/viaje-interface'
+
+const modalEditar = ref<any>(null)
 
 const {
   viajesPaginados,
@@ -14,16 +19,36 @@ const {
   search,
   loading,
   tipoFiltro,
+  filtroEstado,
+  fechaDesde,
+  fechaHasta,
   fetchViajes,
   agregarViaje,
+  actualizarViaje,
+  cancelarViaje,
+  dialogConfirmar,
+  mensajeConfirmar,
+  textoAceptar,
+  colorAceptar,
+  aceptar,
+  cancelar,
 } = useViajes()
 
 onMounted(fetchViajes)
-watch(search, () => { page.value = 1 })
-watch(tipoFiltro, () => {
-  page.value = 1
-  fetchViajes()
-})
+watch(search,       () => { page.value = 1 })
+watch(filtroEstado, () => { page.value = 1 })
+watch(fechaDesde,   () => { page.value = 1 })
+watch(fechaHasta,   () => { page.value = 1 })
+watch(tipoFiltro,   () => { page.value = 1; fetchViajes() })
+
+const estadoConfig: Record<EstadoViaje, { color: string; label: string }> = {
+  programado:  { color: 'primary',  label: 'Programado'  },
+  en_camino:   { color: 'warning',  label: 'En camino'   },
+  entregado:   { color: 'success',  label: 'Entregado'   },
+  regresando:  { color: 'purple',   label: 'Regresando'  },
+  finalizado:  { color: 'default',  label: 'Finalizado'  },
+  cancelado:   { color: 'error',    label: 'Cancelado'   },
+}
 </script>
 
 <template>
@@ -69,6 +94,47 @@ watch(tipoFiltro, () => {
             class="items-select"
           />
 
+          <v-select
+            v-model="filtroEstado"
+            :items="[
+              { title: 'Todos los estados', value: '' },
+              { title: 'Programado',  value: 'programado'  },
+              { title: 'En camino',   value: 'en_camino'   },
+              { title: 'Entregado',   value: 'entregado'   },
+              { title: 'Regresando',  value: 'regresando'  },
+              { title: 'Finalizado',  value: 'finalizado'  },
+              { title: 'Cancelado',   value: 'cancelado'   },
+            ]"
+            item-title="title"
+            item-value="value"
+            variant="outlined"
+            density="compact"
+            hide-details
+            class="items-select"
+          />
+
+          <v-text-field
+            v-model="fechaDesde"
+            label="Salida desde"
+            type="date"
+            variant="outlined"
+            density="compact"
+            hide-details
+            clearable
+            class="items-select"
+          />
+
+          <v-text-field
+            v-model="fechaHasta"
+            label="Salida hasta"
+            type="date"
+            variant="outlined"
+            density="compact"
+            hide-details
+            clearable
+            class="items-select"
+          />
+
           <div class="items-per-page">
             <span>Mostrar:</span>
             <v-select
@@ -92,6 +158,8 @@ watch(tipoFiltro, () => {
             { title: 'Destino', key: 'destino' },
             { title: 'Salida', key: 'fecha_salida' },
             { title: 'Llegada', key: 'fecha_llegada' },
+            { title: 'Estado', key: 'estado', sortable: false },
+            { title: 'Acciones', key: 'acciones', sortable: false },
           ]"
           :items="viajesPaginados"
           :loading="loading"
@@ -100,12 +168,50 @@ watch(tipoFiltro, () => {
           :total-items="totalViajes"
           :total-paginas="totalPaginas"
           @update:page="page = $event"
-        />
+        >
+          <template #item.estado="{ item }">
+            <v-chip
+              size="small"
+              :color="estadoConfig[item.estado as EstadoViaje]?.color"
+              variant="tonal"
+            >
+              {{ estadoConfig[item.estado as EstadoViaje]?.label ?? item.estado }}
+            </v-chip>
+          </template>
+
+          <template #acciones="{ item }">
+            <v-btn
+              v-if="item.estado === 'programado'"
+              icon variant="text" size="small"
+              @click="modalEditar?.abrirModal(item)"
+            >
+              <v-icon size="18">mdi-pencil-outline</v-icon>
+            </v-btn>
+            <v-btn
+              v-if="item.estado === 'programado'"
+              icon variant="text" size="small" color="warning"
+              @click="cancelarViaje(item)"
+            >
+              <v-icon size="18">mdi-cancel</v-icon>
+            </v-btn>
+          </template>
+        </Tabla>
 
         <div class="page-footer">
           <span>© 2026 NovaLogistics.</span>
         </div>
       </div>
+
+      <ModalConfirmar
+        :dialog="dialogConfirmar"
+        :mensaje="mensajeConfirmar"
+        :texto-aceptar="textoAceptar"
+        :color-aceptar="colorAceptar"
+        @aceptar="aceptar"
+        @cancelar="cancelar"
+      />
+      <ModalEditarViaje ref="modalEditar" @viajeEditado="actualizarViaje" />
+
     </v-main>
   </v-app>
 </template>

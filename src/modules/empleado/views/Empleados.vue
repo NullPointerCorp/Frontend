@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, watch, ref, computed } from "vue";
 import { useEmpleado } from "@/modules/empleado/controllers/useEmpleado";
+import { useAuthStore } from "@/modules/auth/store/auth.store";
 
 import ModalRegistrarEmpleado from "./components/ModalRegistrarEmpleado.vue";
 import ModalConfirmar from "@/components/ModalConfirmar.vue";
@@ -8,7 +9,6 @@ import ModalEditarEmpleado from "./components/ModalEditarEmpleado.vue";
 
 import Tabla from "@/components/Tabla.vue";
 import AppHeader from "@/components/AppHeader.vue";
-import type { Empleado } from "../interfaces/empleado-interface";
 
 const modalEditar = ref<any>(null);
 
@@ -22,7 +22,6 @@ const {
   loading,
   fetchEmpleados,
   eliminarEmpleado,
-  actualizarEmpleado,
   dialogConfirmar,
   mensajeConfirmar,
   aceptar,
@@ -33,8 +32,8 @@ const handleEmpleadoCreado = async () => {
   await fetchEmpleados();
 };
 
-const handleEmpleadoEditado = (empleado: Empleado) => {
-  actualizarEmpleado(empleado)
+const handleEmpleadoEditado = async () => {
+  await fetchEmpleados()
 }
 
 const empleadosTabla = computed(() =>
@@ -55,6 +54,8 @@ const empleadosTabla = computed(() =>
     _original: empleado,
   })),
 );
+
+const authStore = useAuthStore()
 
 onMounted(fetchEmpleados);
 watch(search, () => { page.value = 1; });
@@ -108,8 +109,20 @@ watch(search, () => { page.value = 1; });
           { title: 'Nombre de la Sucursal', key: 'nombre_sucursal' },
           { title: 'Acciones', key: 'acciones', sortable: false }
         ]" :items="empleadosTabla" :loading="loading" :page="page" :limit="limit" :total-items="totalEmpleados"
-          :total-paginas="totalPaginas" @editar="modalEditar?.abrirModal($event)" @eliminar="eliminarEmpleado"
-          @update:page="page = $event" />
+          :total-paginas="totalPaginas" @update:page="page = $event">
+          <template #acciones="{ item }">
+            <v-btn icon variant="text" size="small" @click="modalEditar?.abrirModal(item._original ?? item)">
+              <v-icon size="18">mdi-pencil-outline</v-icon>
+            </v-btn>
+            <v-btn
+              v-if="item.empleado_id !== authStore.session?.id"
+              icon variant="text" size="small"
+              @click="eliminarEmpleado(item._original ?? item)"
+            >
+              <v-icon size="18">mdi-trash-can-outline</v-icon>
+            </v-btn>
+          </template>
+        </Tabla>
 
         <div class="page-footer">
           <span>© 2026 NovaLogistics.</span>

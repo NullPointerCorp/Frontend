@@ -17,6 +17,7 @@ const {
   loadingEstados,
   loadingCiudades,
   estadoSeleccionado,
+  esSupervisor,
   abrirModal,
   cerrarModal,
   registrarEmpleado,
@@ -267,7 +268,9 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
           </div>
           <div class="form-group">
             <label class="form-label">Sucursal Asignada <span class="required">*</span></label>
+            <div v-if="esSupervisor" class="readonly-field">{{ sucursales[0]?.nombre_sucursal ?? '-' }}</div>
             <v-select
+              v-else
               v-model="form.sucursal_id"
               :items="sucursales"
               item-title="nombre_sucursal"

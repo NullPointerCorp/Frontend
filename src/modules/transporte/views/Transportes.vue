@@ -12,8 +12,8 @@ import AppHeader from '@/components/AppHeader.vue'
 
 const modalEditar = ref<any>(null)
 const authStore = useAuthStore()
-const esAdministrador = computed(
-  () => authStore.session?.rol?.toLowerCase() === 'administrador'
+const esAdministrador= computed(
+  () => authStore.session?.rol?.toLowerCase() === 'jefe'
 )
 
 const {

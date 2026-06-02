@@ -1,4 +1,4 @@
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { useToast } from '@/composables/useToast'
 import viajeAPI from '../api/viajeAPI'
 import ubicacionAPI from '@/modules/envio/api/ubicacionAPI'
@@ -15,7 +15,7 @@ const formInicial = (): CrearViajeDTO => ({
   numero_serie: '',
   sucursal_destino_id: null,
   fecha_salida: hoyInput(),
-  fecha_llegada: null,
+  fecha_llegada: '',
 })
 
 export const useRegistrarViaje = (onSuccess: (viaje: Viaje) => void) => {
@@ -24,8 +24,10 @@ export const useRegistrarViaje = (onSuccess: (viaje: Viaje) => void) => {
   const dialog = ref(false)
   const loading = ref(false)
   const loadingCatalogos = ref(false)
+  const loadingTransportes = ref(false)
   const erroresForm = ref<Record<string, string>>({})
   const catalogos = ref<ViajeCatalogos | null>(null)
+  const transportes = ref<ViajeCatalogos['transportes']>([])
   const estados = ref<any[]>([])
   const ciudades = ref<any[]>([])
   const sucursalesDestino = ref<any[]>([])
@@ -92,6 +94,30 @@ export const useRegistrarViaje = (onSuccess: (viaje: Viaje) => void) => {
     }
   }
 
+  const fetchTransportesDisponibles = async () => {
+    if (!form.fecha_salida || !form.fecha_llegada) {
+      transportes.value = []
+      form.numero_serie = ''
+      return
+    }
+    loadingTransportes.value = true
+    try {
+      const { data } = await viajeAPI.get<ViajeCatalogos['transportes']>('/transportes-disponibles', {
+        params: { fecha_salida: form.fecha_salida, fecha_llegada: form.fecha_llegada },
+      })
+      transportes.value = Array.isArray(data) ? data : []
+      if (!transportes.value.some((t) => t.numero_serie === form.numero_serie)) {
+        form.numero_serie = ''
+      }
+    } catch {
+      transportes.value = []
+    } finally {
+      loadingTransportes.value = false
+    }
+  }
+
+  watch(() => [form.fecha_salida, form.fecha_llegada], fetchTransportesDisponibles)
+
   const abrirModal = async () => {
     resetForm()
     dialog.value = true
@@ -107,6 +133,14 @@ export const useRegistrarViaje = (onSuccess: (viaje: Viaje) => void) => {
     if (!form.numero_serie) errores.numero_serie = 'Selecciona un transporte'
     if (!form.sucursal_destino_id) errores.sucursal_destino_id = 'Selecciona un destino'
     if (!form.fecha_salida) errores.fecha_salida = 'La fecha de salida es requerida'
+    else if (new Date(form.fecha_salida) < new Date()) errores.fecha_salida = 'La fecha de salida no puede ser en el pasado'
+    if (!form.fecha_llegada) errores.fecha_llegada = 'La fecha de llegada es requerida'
+
+    if (form.fecha_llegada && form.fecha_salida) {
+      if (new Date(form.fecha_llegada) <= new Date(form.fecha_salida)) {
+        errores.fecha_llegada = 'La fecha de llegada debe ser posterior a la fecha de salida'
+      }
+    }
 
     erroresForm.value = errores
     return Object.keys(errores).length === 0
@@ -141,8 +175,10 @@ export const useRegistrarViaje = (onSuccess: (viaje: Viaje) => void) => {
     dialog,
     loading,
     loadingCatalogos,
+    loadingTransportes,
     erroresForm,
     catalogos,
+    transportes,
     estados,
     ciudades,
     sucursalesDestino,

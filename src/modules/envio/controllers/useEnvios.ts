@@ -10,6 +10,7 @@ const search = ref("");
 const page = ref(1);
 const limit = ref(10);
 const loading = ref(false);
+const filtroEstado = ref("");
 
 const normalizarEstadoEnvio = (estado: string) => {
   return estado.trim().toLowerCase().replace(/\s+/g, "_");
@@ -33,15 +34,20 @@ export const useEnvios = () => {
 
   const enviosFiltrados = computed(() => {
     const q = search.value.toLowerCase().trim();
-    return todosLosEnvios.value.filter(
-      (e) =>
+    return todosLosEnvios.value.filter((e) => {
+      if (q && !(
         e.envio_id.toString().includes(q) ||
         e.correo.toLowerCase().includes(q) ||
         e.descripcion.toLowerCase().includes(q) ||
         e.estado_envio.toLowerCase().includes(q) ||
         e.destino.toLowerCase().includes(q) ||
-        e.origen.toLowerCase().includes(q),
-    );
+        e.origen.toLowerCase().includes(q)
+      )) return false;
+
+      if (filtroEstado.value && normalizarEstadoEnvio(e.estado_envio) !== filtroEstado.value) return false;
+
+      return true;
+    });
   });
 
   const totalEnvios = computed(() => enviosFiltrados.value.length);
@@ -67,8 +73,11 @@ export const useEnvios = () => {
     loading.value = true;
 
     try {
+      const sucursal_id = authStore.session?.sucursal_id;
       const endpoint =
-        empleado_rol === "administrador" ? "/" : `/empleado/${empleado_id}`;
+        empleado_rol?.toLowerCase() === "jefe" ? "/" :
+        empleado_rol?.toLowerCase() === "supervisor" ? `/sucursal/${sucursal_id}` :
+        `/empleado/${empleado_id}`;
 
       const { data } = await envioAPI.get<EnvioConsultaDTO[]>(endpoint);
 
@@ -132,6 +141,7 @@ export const useEnvios = () => {
     limit,
     search,
     loading,
+    filtroEstado,
     fetchEnvios,
     dialogConfirmar,
     aceptar,

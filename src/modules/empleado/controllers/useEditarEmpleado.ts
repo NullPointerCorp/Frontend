@@ -1,10 +1,11 @@
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { actualizarEmpleadoSchema } from '@/modules/empleado/schemas/EmpleadoSchema'
 import type { Empleado, ActualizarEmpleadoDTO } from '@/modules/empleado/interfaces/empleado-interface'
 import type { Rol } from '@/modules/rol/interfaces/rol-interface'
 import type { SucursalOpcion } from '@/composables/useUbicacion'
 import { useToast } from '@/composables/useToast'
 import { useUbicacion } from '@/composables/useUbicacion'
+import { useAuthStore } from '@/modules/auth/store/auth.store'
 import empleadoAPI from '../api/empleadoAPI'
 import rolAPI from '@/modules/rol/api/rolAPI'
 import sucursalAPI from '@/modules/sucursal/api/sucursalAPI'
@@ -28,6 +29,9 @@ interface FormEditarEmpleado {
 
 export const useEditarEmpleado = (onSuccess: (empleado: Empleado) => void) => {
   const { showToast } = useToast()
+  const authStore = useAuthStore()
+
+  const esSupervisor = computed(() => authStore.session?.rol?.toLowerCase() === 'supervisor')
 
   const {
     estados,
@@ -89,18 +93,26 @@ export const useEditarEmpleado = (onSuccess: (empleado: Empleado) => void) => {
     })
   })
 
-  const fetchCatalogos = async () => {
+  const fetchCatalogos = async (sucursalIdSupervisor?: number | null) => {
     const [rolesData, sucursalesData] = await Promise.all([
       rolAPI.get<Rol[]>('/').then(({ data }) => (Array.isArray(data) ? data : [])),
       sucursalAPI.get<SucursalOpcion[]>('/').then(({ data }) => (Array.isArray(data) ? data : [])),
       fetchEstados(),
     ])
-    roles.value = rolesData
-    sucursales.value = sucursalesData
+    roles.value = esSupervisor.value
+      ? rolesData.filter((r) => r.rol_nombre?.toLowerCase() !== 'supervisor')
+      : rolesData
+    const sid = sucursalIdSupervisor ?? authStore.session?.sucursal_id
+    sucursales.value = esSupervisor.value && sid
+      ? sucursalesData.filter((s) => s.sucursal_id === sid)
+      : sucursalesData
   }
 
   const abrirModal = async (empleado: Empleado) => {
     empleadoSeleccionado.value = empleado
+    const sucursalId = esSupervisor.value
+      ? (authStore.session?.sucursal_id ?? empleado.sucursal_id)
+      : empleado.sucursal_id
     form.value = {
       nombre: empleado.nombre,
       apellido_paterno: empleado.apellido_paterno,
@@ -115,10 +127,10 @@ export const useEditarEmpleado = (onSuccess: (empleado: Empleado) => void) => {
       numero_exterior: empleado.numero_exterior,
       numero_interior: empleado.numero_interior || '',
       rol_id: empleado.rol_id,
-      sucursal_id: empleado.sucursal_id,
+      sucursal_id: sucursalId,
     }
     resetErrores()
-    await fetchCatalogos()
+    await fetchCatalogos(sucursalId)
     estadoSeleccionado.value = empleado.estado_id ?? null
     dialog.value = true
   }
@@ -189,15 +201,15 @@ export const useEditarEmpleado = (onSuccess: (empleado: Empleado) => void) => {
 
     loading.value = true
     try {
-      const { data } = await empleadoAPI.put<Empleado>(
+      const { data } = await empleadoAPI.put<{ message: string; data: Empleado }>(
         `/${empleadoSeleccionado.value.empleado_id}`,
         datos
       )
+      const empleadoActualizado = data.data ?? data as unknown as Empleado
       onSuccess({
         ...empleadoSeleccionado.value,
-        ...datos,
-        ...data,
-        numero_interior: data.numero_interior ?? undefined,
+        ...empleadoActualizado,
+        numero_interior: empleadoActualizado.numero_interior ?? undefined,
       })
       showToast('¡Empleado modificado con éxito!', 'success')
       cerrarModal()
@@ -221,6 +233,7 @@ export const useEditarEmpleado = (onSuccess: (empleado: Empleado) => void) => {
     loadingEstados,
     loadingCiudades,
     estadoSeleccionado,
+    esSupervisor,
     abrirModal,
     cerrarModal,
     editarEmpleado,

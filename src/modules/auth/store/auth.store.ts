@@ -6,6 +6,7 @@ export interface Session {
   nombre: string;
   rol: string;
   rol_id: number;
+  sucursal_id: number | null;
 }
 
 export const useAuthStore = defineStore("auth", () => {

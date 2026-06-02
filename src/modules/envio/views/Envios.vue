@@ -2,12 +2,17 @@
 import { onMounted, ref, watch } from "vue";
 import { useEnvios } from "../controllers/useEnvios";
 import type { EnvioConsultaDTO } from "../interfaces/envio-interface";
-
+import { estadoEnvioConfig } from "../interfaces/envio-interface";
 import ModalConfirmar from "@/components/ModalConfirmar.vue";
 import ModalRegistrarEnvio from "./components/ModalRegistrarEnvio.vue";
 import ModalMotivoCancelacion from "./components/ModalMotivoCancelacion.vue";
 import ModalDetalleEnvio from "./components/ModalDetalleEnvio.vue";
 import AppHeader from "@/components/AppHeader.vue";
+
+const estadoEnvio = (estado: string) => {
+  const key = estado.trim().toLowerCase().replace(/\s+/g, '_') as keyof typeof estadoEnvioConfig
+  return estadoEnvioConfig[key] ?? { color: 'primary', label: estado }
+}
 
 const {
   enviosPaginados,
@@ -17,6 +22,7 @@ const {
   limit,
   search,
   loading,
+  filtroEstado,
   fetchEnvios,
   dialogConfirmar,
   aceptar,
@@ -49,7 +55,8 @@ const puedeCancelarEnvio = (estado: string) => {
 };
 
 onMounted(fetchEnvios);
-watch(search, () => { page.value = 1; });
+watch(search,       () => { page.value = 1; });
+watch(filtroEstado, () => { page.value = 1; });
 </script>
 
 <template>
@@ -80,6 +87,24 @@ watch(search, () => { page.value = 1; });
               class="search-field"
             />
           </div>
+          <v-select
+            v-model="filtroEstado"
+            :items="[
+              { title: 'Todos los estados', value: '' },
+              { title: 'En Espera',   value: 'en_espera'  },
+              { title: 'Registrado',  value: 'registrado' },
+              { title: 'En Camino',   value: 'en_camino'  },
+              { title: 'Entregado',   value: 'entregado'  },
+              { title: 'Cancelado',   value: 'cancelado'  },
+            ]"
+            item-title="title"
+            item-value="value"
+            variant="outlined"
+            density="compact"
+            hide-details
+            class="items-select"
+          />
+
           <div class="items-per-page">
             <span>Mostrar:</span>
             <v-select
@@ -121,10 +146,10 @@ watch(search, () => { page.value = 1; });
               <template #item.estado_envio="{ item }">
                 <v-chip
                   size="small"
-                  :color="item.estado_envio?.toLowerCase() === 'cancelado' ? 'error' : item.estado_envio?.toLowerCase() === 'en espera' ? 'warning' : 'primary'"
+                  :color="estadoEnvio(item.estado_envio).color"
                   variant="tonal"
                 >
-                  {{ item.estado_envio }}
+                  {{ estadoEnvio(item.estado_envio).label }}
                 </v-chip>
               </template>
 
